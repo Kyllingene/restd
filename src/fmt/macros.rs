@@ -1,0 +1,93 @@
+#[cfg(any(feature = "std", test))]
+mod with_std {
+    #[macro_export]
+    macro_rules! format {
+        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
+            let mut s = ::std::string::String::new();
+            let mut f = $crate::fmt::Formatter::<$crate::fmt::Display>::new(&mut s);
+
+            $(
+                $crate::fmt::Format::<
+                    $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
+                >::fmt(&$el, f.style()).expect(concat!(
+                    "failed to format argument `",
+                    stringify!($el),
+                    "`",
+                    $(
+                        " (with style `",
+                        stringify!($style),
+                        "`)",
+                    )?
+                ));
+            )*
+
+            s
+        }};
+    }
+
+    #[macro_export]
+    macro_rules! print {
+        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
+            let mut s = ::std::io::stdout().lock();
+            let mut f = $crate::fmt::Formatter::<$crate::fmt::Display>::new(&mut s);
+
+            $(
+                $crate::fmt::Format::<
+                    $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
+                >::fmt(&$el, f.style()).expect(concat!(
+                    "failed to format argument `",
+                    stringify!($el),
+                    "`",
+                    $(
+                        " (with style `",
+                        stringify!($style),
+                        "`)",
+                    )?
+                ));
+            )*
+        }};
+    }
+
+    #[macro_export]
+    macro_rules! println {
+        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {
+            $crate::print!($( $el $( => $style )?, )* '\n')
+        };
+    }
+
+    #[macro_export]
+    macro_rules! eprint {
+        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
+            let mut s = ::std::io::stderr().lock();
+            let mut f = $crate::fmt::Formatter::<$crate::fmt::Display>::new(&mut s);
+
+            $(
+                $crate::fmt::Format::<
+                    $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
+                >::fmt(&$el, f.style()).expect(concat!(
+                    "failed to format argument `",
+                    stringify!($el),
+                    "`",
+                    $(
+                        " (with style `",
+                        stringify!($style),
+                        "`)",
+                    )?
+                ));
+            )*
+        }};
+    }
+
+    #[macro_export]
+    macro_rules! eprintln {
+        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {
+            $crate::eprint!($( $el $( => $style )?, )* '\n')
+        };
+    }
+}
+
+#[macro_export]
+macro_rules! _if_else {
+    ( [] else [$($t:tt)*] ) => { $($t)* };
+    ( [$($t:tt)*] else [$($_:tt)*] ) => { $($t)* };
+}
