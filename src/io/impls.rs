@@ -1,4 +1,4 @@
-use super::{Read, Write, ReadResult, Result};
+use super::{Read, ReadResult, Result, Write};
 
 #[cfg(any(feature = "std", test))]
 pub use with_std::to_io;
@@ -27,7 +27,6 @@ impl<T: Read> Read for &'_ mut T {
     fn read_to_string(&mut self, buf: &mut String) -> ReadResult {
         (*self).read_to_string(buf)
     }
-
 }
 
 impl<T: Write> Write for &'_ mut T {
@@ -46,7 +45,7 @@ impl<T: Write> Write for &'_ mut T {
 
 #[cfg(any(feature = "std", test))]
 mod with_std {
-    use crate::io::{Error, ReadResult, Read, Result, Write};
+    use crate::io::{Error, Read, ReadResult, Result, Write};
     use std::io;
 
     impl Read for io::Stdin {
@@ -71,25 +70,21 @@ mod with_std {
 
     impl Write for io::Stdout {
         fn write(&mut self, buf: &[u8]) -> Result<usize> {
-            io::Write::write(self, buf)
-                .map_err(|e| from_write_err(e.kind()))
+            io::Write::write(self, buf).map_err(|e| from_write_err(e.kind()))
         }
 
         fn flush(&mut self) -> Result<()> {
-            io::Write::flush(self)
-                .map_err(|e| from_write_err(e.kind()))
+            io::Write::flush(self).map_err(|e| from_write_err(e.kind()))
         }
     }
 
     impl Write for io::StdoutLock<'_> {
         fn write(&mut self, buf: &[u8]) -> Result<usize> {
-            io::Write::write(self, buf)
-                .map_err(|e| from_write_err(e.kind()))
+            io::Write::write(self, buf).map_err(|e| from_write_err(e.kind()))
         }
 
         fn flush(&mut self) -> Result<()> {
-            io::Write::flush(self)
-                .map_err(|e| from_write_err(e.kind()))
+            io::Write::flush(self).map_err(|e| from_write_err(e.kind()))
         }
     }
 

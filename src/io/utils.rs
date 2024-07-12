@@ -1,4 +1,4 @@
-use super::{Read, ReadResult, Result, Seek, Write, Error};
+use super::{Error, Read, ReadResult, Result, Seek, Write};
 
 pub fn copy<R, W>(reader: &mut R, writer: &mut W) -> ReadResult
 where
@@ -28,10 +28,7 @@ pub struct Cursor<A> {
 
 impl<A> Cursor<A> {
     pub fn new(data: A) -> Self {
-        Self {
-            data,
-            idx: 0,
-        }
+        Self { data, idx: 0 }
     }
 }
 
@@ -40,7 +37,10 @@ where
     A: AsRef<[u8]>,
 {
     fn seek(&mut self, by: isize) -> Result<usize> {
-        self.idx = self.idx.saturating_add_signed(by).min(self.data.as_ref().len());
+        self.idx = self
+            .idx
+            .saturating_add_signed(by)
+            .min(self.data.as_ref().len());
         Ok(self.idx)
     }
 
@@ -97,7 +97,9 @@ where
         }
     }
 
-    fn flush(&mut self) -> Result<()> { Ok(()) }
+    fn flush(&mut self) -> Result<()> {
+        Ok(())
+    }
 }
 
 pub struct Buffer<A> {
@@ -110,10 +112,7 @@ where
     A: AsRef<[u8]> + AsMut<[u8]>,
 {
     pub fn new(data: A) -> Self {
-        Self {
-            data,
-            len: 0,
-        }
+        Self { data, len: 0 }
     }
 
     pub fn into_inner(self) -> A {
@@ -167,5 +166,7 @@ where
         }
     }
 
-    fn flush(&mut self) -> Result<()> { Ok(()) }
+    fn flush(&mut self) -> Result<()> {
+        Ok(())
+    }
 }

@@ -1,4 +1,4 @@
-use super::{Read, Write, Buffer};
+use super::{Buffer, Read, Write};
 
 #[test]
 fn buffer() {

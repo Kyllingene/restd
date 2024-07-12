@@ -8,7 +8,7 @@ mod test;
 
 #[cfg(any(feature = "std", test))]
 pub use impls::to_io;
-pub use utils::{Cursor, Buffer, copy};
+pub use utils::{copy, Buffer, Cursor};
 
 pub type Result<T> = core::result::Result<T, Error>;
 pub type ReadResult = Result<Option<usize>>;
