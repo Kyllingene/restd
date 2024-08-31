@@ -1,0 +1,25 @@
+use crate::io::{Read, ReadResult, Write};
+
+pub mod buffer;
+pub mod cursor;
+
+pub fn copy<R, W>(reader: &mut R, writer: &mut W) -> ReadResult
+where
+    R: Read + ?Sized,
+    W: Write + ?Sized,
+{
+    let mut any = false;
+    let mut total = 0;
+    let mut buf = [0; 128];
+    while let Some(read) = reader.read(&mut buf)? {
+        writer.write_all(&buf)?;
+        total += read;
+        any = true;
+    }
+
+    if any {
+        Ok(Some(total))
+    } else {
+        Ok(None)
+    }
+}

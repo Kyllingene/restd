@@ -16,6 +16,7 @@ pub trait Format<S: Style> {
     fn fmt(&self, f: &mut Formatter<'_, S>) -> Result;
 }
 
+#[repr(transparent)]
 pub struct Formatter<'a, S> {
     buf: &'a mut dyn Write,
     _marker: PhantomData<fn() -> S>,
@@ -33,8 +34,9 @@ where
         }
     }
 
+    // TODO: should this be something else instead?
     pub fn style<S2: Style>(&mut self) -> &mut Formatter<'a, S2> {
-        // SAFETY: the only non-ZST field is `buf` which doesn't change
+        // SAFETY: repr(transparent)
         unsafe { core::mem::transmute(self) }
     }
 }
