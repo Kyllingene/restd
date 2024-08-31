@@ -6,5 +6,5 @@ edition = "2021"
 license = "MIT"
 
 [features]
-default = []
+default = ["std"]
 std = []
