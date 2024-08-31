@@ -4,12 +4,10 @@ mod with_std {
     macro_rules! format {
         ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
             let mut s = ::std::string::String::new();
-            let mut f = $crate::fmt::Formatter::<$crate::fmt::Display>::new(&mut s);
-
             $(
                 $crate::fmt::Format::<
                     $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
-                >::fmt(&$el, f.style()).expect(concat!(
+                >::fmt(&$el, $crate::fmt::Style::style(&mut s)).expect(concat!(
                     "failed to format argument `",
                     stringify!($el),
                     "`",
@@ -29,12 +27,10 @@ mod with_std {
     macro_rules! print {
         ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
             let mut s = ::std::io::stdout().lock();
-            let mut f = $crate::fmt::Formatter::<$crate::fmt::Display>::new(&mut s);
-
             $(
                 $crate::fmt::Format::<
                     $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
-                >::fmt(&$el, f.style()).expect(concat!(
+                >::fmt(&$el, $crate::fmt::Style::style(&mut s)).expect(concat!(
                     "failed to format argument `",
                     stringify!($el),
                     "`",
@@ -59,12 +55,10 @@ mod with_std {
     macro_rules! eprint {
         ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
             let mut s = ::std::io::stderr().lock();
-            let mut f = $crate::fmt::Formatter::<$crate::fmt::Display>::new(&mut s);
-
             $(
                 $crate::fmt::Format::<
                     $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
-                >::fmt(&$el, f.style()).expect(concat!(
+                >::fmt(&$el, $crate::fmt::Style::style(&mut s)).expect(concat!(
                     "failed to format argument `",
                     stringify!($el),
                     "`",

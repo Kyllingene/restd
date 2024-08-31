@@ -1,6 +1,10 @@
 [package]
-name = "foment"
+name = "restd"
 version = "0.1.0"
 edition = "2021"
 
-[dependencies]
+license = "MIT"
+
+[features]
+default = []
+std = []
