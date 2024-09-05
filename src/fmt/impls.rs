@@ -1,6 +1,4 @@
-use core::ops::DerefMut;
-
-use super::{Debug, Display, Format, Result, Style, Write};
+use super::{Debug, Display, Format, Formatter, Result, Style, Write};
 
 fn dbg_char(ch: char, f: &mut dyn Write) -> Result {
     if ch == '\'' {
@@ -17,27 +15,27 @@ fn dbg_char(ch: char, f: &mut dyn Write) -> Result {
 impl<'a, T, S> Format<S> for &'a T
 where
     T: Format<S> + ?Sized,
-    S: Style + ?Sized,
+    S: Style,
 {
-    fn fmt(&self, f: &mut S) -> Result {
+    fn fmt(&self, f: Formatter<'_, S>) -> Result {
         (*self).fmt(f)
     }
 }
 
 impl Format<Debug> for () {
-    fn fmt(&self, f: &mut Debug) -> Result {
+    fn fmt(&self, mut f: Formatter<'_, Debug>) -> Result {
         f.write_str("()")
     }
 }
 
 impl Format<Debug> for str {
-    fn fmt(&self, f: &mut Debug) -> Result {
+    fn fmt(&self, mut f: Formatter<'_, Debug>) -> Result {
         f.write_char('"')?;
         for ch in self.chars() {
             if ch == '"' {
                 f.write_str(r#"\"#)?;
             } else {
-                dbg_char(ch, f.deref_mut())?;
+                dbg_char(ch, &mut f)?;
             }
         }
         f.write_char('"')
@@ -45,15 +43,15 @@ impl Format<Debug> for str {
 }
 
 impl Format<Display> for str {
-    fn fmt(&self, f: &mut Display) -> Result {
+    fn fmt(&self, mut f: Formatter<'_, Display>) -> Result {
         f.write_str(self)
     }
 }
 
 impl Format<Debug> for char {
-    fn fmt(&self, f: &mut Debug) -> Result {
+    fn fmt(&self, mut f: Formatter<'_, Debug>) -> Result {
         f.write_char('\'')?;
-        dbg_char(*self, f.deref_mut())?;
+        dbg_char(*self, &mut f)?;
         f.write_char('\'')?;
 
         Ok(())
@@ -61,7 +59,24 @@ impl Format<Debug> for char {
 }
 
 impl Format<Display> for char {
-    fn fmt(&self, f: &mut Display) -> Result {
+    fn fmt(&self, mut f: Formatter<'_, Display>) -> Result {
         f.write_char(*self)
+    }
+}
+
+#[cfg(any(test, feature = "std"))]
+mod with_std {
+    use crate::fmt::{Debug, Display, Format, Formatter, Result};
+
+    impl Format<Debug> for String {
+        fn fmt(&self, f: Formatter<'_, Debug>) -> Result {
+            self.as_str().fmt(f)
+        }
+    }
+
+    impl Format<Display> for String {
+        fn fmt(&self, f: Formatter<'_, Display>) -> Result {
+            self.as_str().fmt(f)
+        }
     }
 }

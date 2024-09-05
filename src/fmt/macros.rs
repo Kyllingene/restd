@@ -2,18 +2,31 @@
 mod with_std {
     #[macro_export]
     macro_rules! format {
-        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
+        ( $(
+            $el:expr
+            $( => $style:ident $(::$path:ident)*
+                $(< $($gens:tt)* >)?
+                $(( $($args:tt)* ))?
+            )?
+        ),* $(,)? ) => {{
             let mut s = ::std::string::String::new();
             $(
                 $crate::fmt::Format::<
-                    $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
-                >::fmt(&$el, $crate::fmt::Style::style(&mut s)).expect(concat!(
+                    $crate::_if_else!(
+                        [$( $style $(::$path)* $(< $($gens)* >)? )?]
+                        else [$crate::fmt::Display]
+                    )
+                >::fmt(&$el, $crate::fmt::Formatter::new(
+                    &mut s,
+                    $crate::_if_else!([$($(( $($args)* ))?)?] else [&()])
+                )).expect(concat!(
                     "failed to format argument `",
                     stringify!($el),
                     "`",
                     $(
                         " (with style `",
                         stringify!($style),
+                        stringify!($(::$path)*),
                         "`)",
                     )?
                 ));

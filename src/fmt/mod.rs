@@ -1,8 +1,9 @@
-use core::ops::DerefMut;
+use core::ops::{Deref, DerefMut};
 
-mod args;
+pub mod args;
 mod debug;
 mod display;
+mod hex;
 mod impls;
 mod macros;
 
@@ -17,15 +18,55 @@ pub use display::Display;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Error;
 
-pub trait Style: DerefMut<Target = dyn Write> {
-    fn style(f: &mut dyn Write) -> &mut Self;
-    fn done(&mut self) -> &mut dyn Write {
-        self.deref_mut()
+pub trait Style {
+    type Arguments;
+    fn create(args: &Self::Arguments) -> Self;
+}
+
+pub struct Formatter<'a, S: Style> {
+    pub buf: &'a mut dyn Write,
+    pub style: S,
+}
+
+impl<'a, S: Style> Formatter<'a, S> {
+    pub fn new(buf: &'a mut dyn Write, args: &S::Arguments) -> Self {
+        Self {
+            buf,
+            style: Style::create(args),
+        }
+    }
+
+    pub fn inner(&mut self) -> &mut dyn Write {
+        self.buf
+    }
+
+    pub fn into_inner(self) -> &'a mut dyn Write {
+        self.buf
     }
 }
 
-pub trait Format<S: Style + ?Sized> {
-    fn fmt(&self, f: &mut S) -> Result;
+impl<S: Style> Deref for Formatter<'_, S> {
+    type Target = S;
+
+    fn deref(&self) -> &S { &self.style }
+}
+
+impl<S: Style> DerefMut for Formatter<'_, S> {
+    fn deref_mut(&mut self) -> &mut S { &mut self.style }
+}
+
+impl<S: Style> Write for Formatter<'_, S> {
+    fn write_str(&mut self, data: &str) -> Result {
+        self.buf.write_str(data)
+    }
+
+    fn write_char(&mut self, data: char) -> Result {
+        self.buf.write_char(data)
+    }
+}
+
+pub trait Format<S: Style> {
+    fn fmt(&self, f: Formatter<'_, S>) -> Result;
 }
 
 pub trait Write {
@@ -46,8 +87,8 @@ impl<W: core::fmt::Write + ?Sized> Write for W {
 }
 
 pub trait Stylable: Write + Sized + Sealed {
-    fn style<S: Style + ?Sized>(&mut self) -> &mut S {
-        S::style(self)
+    fn style<S: Style>(&mut self, args: &S::Arguments) -> Formatter<'_, S> {
+        Formatter::new(self, args)
     }
 }
 
@@ -59,6 +100,7 @@ mod private {
     impl<T: super::Write> Sealed for T {}
 }
 
+// TODO: support style arguments
 #[macro_export]
 macro_rules! style {
     (
@@ -67,28 +109,11 @@ macro_rules! style {
         $($impl:tt)*
     ) => {
         $(#[$attr])*
-        #[repr(transparent)]
-        $v struct $name(dyn $crate::fmt::Write);
-
-        impl ::core::ops::Deref for $name {
-            type Target = dyn $crate::fmt::Write;
-
-            fn deref(&self) -> &Self::Target {
-                &self.0
-            }
-        }
-
-        impl ::core::ops::DerefMut for $name {
-            fn deref_mut(&mut self) -> &mut Self::Target {
-                &mut self.0
-            }
-        }
+        $v struct $name;
 
         impl $crate::fmt::Style for $name {
-            fn style(f: &mut dyn $crate::fmt::Write) -> &mut Self {
-                // SAFETY: Self is repr(transparent)
-                unsafe { ::core::mem::transmute(f) }
-            }
+            type Arguments = ();
+            fn create((): &()) -> Self { Self }
         }
 
         impl $name {
