@@ -15,7 +15,7 @@ mod test;
 
 #[cfg(any(feature = "std", test))]
 pub use impls::to_io;
-pub use utils::{buffer::Buffer, copy, cursor::Cursor};
+pub use utils::{buffer::Buffer, copy, cursor::Cursor, counter::Counter};
 
 /// A specialized Result alias for I/O operations.
 pub type Result<T> = core::result::Result<T, Error>;

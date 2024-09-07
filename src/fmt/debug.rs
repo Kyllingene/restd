@@ -1,5 +1,2 @@
-use super::style;
-
-style! {
-    pub struct Debug;
-}
+pub struct Debug;
+impl super::Style for Debug {}

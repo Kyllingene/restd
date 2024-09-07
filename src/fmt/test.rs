@@ -1,4 +1,5 @@
-use super::{Debug, Display};
+#![allow(warnings)]
+use super::{Debug, Display, Pad, Dir};
 use crate::format;
 
 // #[test]
@@ -38,8 +39,30 @@ fn manual_args() {
 }
 
 #[test]
-fn manual_args_with_args() {
+fn manual_pad() {
     use crate::fmt::args::*;
 
-    todo!()
+    let rpad = Pad {
+        align: Dir::Right,
+        ch: ' ',
+        count: 12,
+        style: Display,
+    };
+    let lpad = Pad {
+        align: Dir::Left,
+        ch: ' ',
+        count: 12,
+        style: Display,
+    };
+    let slice = [
+        Var::new(&"foobar", &rpad),
+        Var::new(&'\n', &Display),
+        Var::new(&"longer-string", &lpad),
+    ];
+    let args = Arguments(&slice[..]);
+
+    let mut f = String::new();
+    args.write(&mut f).unwrap();
+
+    assert_eq!(f, "      foobar\nlonger-string");
 }

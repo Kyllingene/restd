@@ -1,5 +1,2 @@
-use super::style;
-
-style! {
-    pub struct Display;
-}
+pub struct Display;
+impl super::Style for Display {}
