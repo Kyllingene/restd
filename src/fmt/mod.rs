@@ -1,4 +1,4 @@
-use core::ops::{Deref, DerefMut};
+use core::ops::Deref;
 
 pub mod args;
 mod debug;
@@ -18,41 +18,25 @@ pub use display::Display;
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Error;
 
-pub trait Style {
-    type Arguments;
-    fn create(args: &Self::Arguments) -> Self;
-}
+pub trait Style {}
 
 pub struct Formatter<'a, S: Style> {
     pub buf: &'a mut dyn Write,
-    pub style: S,
+    pub style: &'a S,
 }
 
 impl<'a, S: Style> Formatter<'a, S> {
-    pub fn new(buf: &'a mut dyn Write, args: &S::Arguments) -> Self {
-        Self {
-            buf,
-            style: Style::create(args),
-        }
-    }
-
-    pub fn inner(&mut self) -> &mut dyn Write {
-        self.buf
-    }
-
-    pub fn into_inner(self) -> &'a mut dyn Write {
-        self.buf
+    pub fn new(buf: &'a mut dyn Write, style: &'a S) -> Self {
+        Self { buf, style }
     }
 }
 
 impl<S: Style> Deref for Formatter<'_, S> {
     type Target = S;
 
-    fn deref(&self) -> &S { &self.style }
-}
-
-impl<S: Style> DerefMut for Formatter<'_, S> {
-    fn deref_mut(&mut self) -> &mut S { &mut self.style }
+    fn deref(&self) -> &S {
+        self.style
+    }
 }
 
 impl<S: Style> Write for Formatter<'_, S> {
@@ -87,8 +71,8 @@ impl<W: core::fmt::Write + ?Sized> Write for W {
 }
 
 pub trait Stylable: Write + Sized + Sealed {
-    fn style<S: Style>(&mut self, args: &S::Arguments) -> Formatter<'_, S> {
-        Formatter::new(self, args)
+    fn style<'a, S: Style>(&'a mut self, style: &'a S) -> Formatter<'a, S> {
+        Formatter::new(self, style)
     }
 }
 
@@ -105,20 +89,28 @@ mod private {
 macro_rules! style {
     (
         $(#[$attr:meta])*
-        $v:vis struct $name:ident;
-        $($impl:tt)*
+        $v:vis struct $name:ident
+            $(< $($generics:tt)* >)?
+            $(( $($tuple_fields:tt)* ))?
+            $({ $($struct_fields:tt)* })?
+            $(; $(@ $semicolon:tt)?)?
+
+        $(impl {
+            $($impl:tt)*
+        })?
     ) => {
         $(#[$attr])*
-        $v struct $name;
+        $v struct $name
+            $(< $($generics)* >)?
+            $(( $($tuple_fields)* ))?
+            $({ $($struct_fields)* })?
+            $(; $($semicolon)?)?
 
-        impl $crate::fmt::Style for $name {
-            type Arguments = ();
-            fn create((): &()) -> Self { Self }
-        }
+        impl $crate::fmt::Style for $name {}
 
-        impl $name {
+        $(impl $name {
             $($impl)*
-        }
+        })?
     };
 }
 use style;
