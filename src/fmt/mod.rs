@@ -47,6 +47,13 @@ pub trait Write {
     fn write_char(&mut self, data: char) -> Result {
         self.write_str(data.encode_utf8(&mut [0; 4]))
     }
+
+    fn write_args(&mut self, args: args::Arguments<'_>) -> Result
+    where
+        Self: Sized,
+    {
+        args.write(self)
+    }
 }
 
 impl<W: core::fmt::Write + ?Sized> Write for W {
@@ -91,4 +98,24 @@ macro_rules! stylable {
             }
         }
     )+};
+}
+
+#[doc(hidden)]
+#[cfg(any(feature = "std", test))]
+pub fn _print(args: args::Arguments<'_>) {
+    crate::io::IoFmt(std::io::stdout()).write_args(args).unwrap();
+}
+
+#[doc(hidden)]
+#[cfg(any(feature = "std", test))]
+pub fn _eprint(args: args::Arguments<'_>) {
+    crate::io::IoFmt(std::io::stderr()).write_args(args).unwrap();
+}
+
+#[doc(hidden)]
+#[cfg(any(feature = "std", test))]
+pub fn _format(args: args::Arguments<'_>) -> String {
+    let mut s = String::new();
+    args.write(&mut s).unwrap();
+    s
 }

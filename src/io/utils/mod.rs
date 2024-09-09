@@ -3,6 +3,7 @@ use crate::io::{Read, ReadResult, Write};
 pub mod buffer;
 pub mod counter;
 pub mod cursor;
+pub mod io_fmt;
 
 pub fn copy<R, W>(reader: &mut R, writer: &mut W) -> ReadResult
 where

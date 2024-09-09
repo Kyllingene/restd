@@ -15,7 +15,7 @@ mod test;
 
 #[cfg(any(feature = "std", test))]
 pub use impls::to_io;
-pub use utils::{buffer::Buffer, copy, cursor::Cursor, counter::Counter};
+pub use utils::{buffer::Buffer, copy, cursor::Cursor, counter::Counter, io_fmt::IoFmt};
 
 /// A specialized Result alias for I/O operations.
 pub type Result<T> = core::result::Result<T, Error>;
@@ -144,6 +144,19 @@ pub trait Write {
         }
 
         Ok(())
+    }
+
+    /// Writes a formatted string into this writer, returning any error
+    /// encountered.
+    ///
+    /// This method is primarily used to interface with the [`format_args!()`]
+    /// macro, and it is rare that this should explicitly be called. The
+    /// [`write!()`] macro should be favored to invoke this method instead.
+    fn write_args(&mut self, args: crate::fmt::args::Arguments<'_>) -> crate::fmt::Result
+    where
+        Self: Sized,
+    {
+        args.write(&mut IoFmt(self))
     }
 }
 

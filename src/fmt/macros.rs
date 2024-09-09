@@ -11,12 +11,14 @@ macro_rules! format_args {
         
         $( as
             $style:ident
+                $(:: $(@ $gens_colon:tt)?)?
                 $(< $($gens:tt)* >)?
+                $(:: $assoc:ident)?
                 $(( $($tpl_args:tt)* ))?
                 $({ $($sct_args:tt)* })?
         )?
-    ),* $(,)?) => {{
-        $crate::fmt::args::Arguments([$(
+    ),+ $(,)?) => {
+        $crate::fmt::args::Arguments(&[$(
             $crate::fmt::args::Var::new(
                 $(&$el_id,)?
                 $(&$el_li,)?
@@ -25,7 +27,9 @@ macro_rules! format_args {
                 $crate::_if_else!(
                     [$(
                         &$style
+                            $(:: $($gens_colon)?)?
                             $(< $($gens)* >)?
+                            $(:: $assoc)?
                             $(( $($tpl_args)* ))?
                             $({ $($sct_args)* })?
                     )?]
@@ -34,104 +38,111 @@ macro_rules! format_args {
                 )
             ),
         )*])
-    }};
+    };
+}
+
+#[macro_export]
+macro_rules! format_args_nl {
+    () => {
+        $crate::fmt::args::Arguments(&[])
+    };
+
+    ($(
+        $(  $el_id:ident   )?
+        $(  $el_li:literal )?
+        $({ $el_ex:expr   })?
+        
+        $( as
+            $style:ident
+                $(:: $(@ $gens_colon:tt)?)?
+                $(< $($gens:tt)* >)?
+                $(:: $assoc:ident)?
+                $(( $($tpl_args:tt)* ))?
+                $({ $($sct_args:tt)* })?
+        )?
+    ),+ $(,)?) => {
+        $crate::fmt::args::Arguments(&[$(
+            $crate::fmt::args::Var::new(
+                $(&$el_id,)?
+                $(&$el_li,)?
+                $(&$el_ex,)?
+
+                $crate::_if_else!(
+                    [$(
+                        &$style
+                            $(:: $($gens_colon)?)?
+                            $(< $($gens)* >)?
+                            $(:: $assoc)?
+                            $(( $($tpl_args)* ))?
+                            $({ $($sct_args)* })?
+                    )?]
+                    else
+                    [&$crate::fmt::Display]
+                )
+            ),
+        )*
+            $crate::fmt::args::Var::new(&'\n', &$crate::fmt::Display),
+        ])
+    };
+}
+
+#[macro_export]
+macro_rules! write {
+    ($dst:expr, $($t:tt)*) => {
+        $dst.write_args(&$crate::format_args!($($t)*))
+    };
+}
+
+#[macro_export]
+macro_rules! writeln {
+    ($dst:expr $(,)?) => {
+        $crate::write!($dst, '\n')
+    };
+
+    ($dst:expr, $($t:tt)*) => {
+        $dst.write_args(&$crate::format_args_nl!($($t)*))
+    };
 }
 
 #[cfg(any(feature = "std", test))]
 mod with_std {
     #[macro_export]
     macro_rules! format {
-        ( $(
-            $el:expr
-            $( => $style:ident $(::$path:ident)*
-                $(< $($gens:tt)* >)?
-                $(( $($args:tt)* ))?
-            )?
-        ),* $(,)? ) => {{
-            let mut s = ::std::string::String::new();
-            $(
-                $crate::fmt::Format::<
-                    $crate::_if_else!(
-                        [$( $style $(::$path)* $(< $($gens)* >)? )?]
-                        else [$crate::fmt::Display]
-                    )
-                >::fmt(&$el, $crate::fmt::Formatter::new(
-                    &mut s,
-                    $crate::_if_else!([$($(( $($args)* ))?)?] else [&()])
-                )).expect(concat!(
-                    "failed to format argument `",
-                    stringify!($el),
-                    "`",
-                    $(
-                        " (with style `",
-                        stringify!($style),
-                        stringify!($(::$path)*),
-                        "`)",
-                    )?
-                ));
-            )*
-
-            s
-        }};
+        ($($t:tt)*) => {
+            $crate::fmt::_format($crate::format_args!($($t)*))
+        };
     }
 
     #[macro_export]
     macro_rules! print {
-        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
-            let mut s = ::std::io::stdout().lock();
-            $(
-                $crate::fmt::Format::<
-                    $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
-                >::fmt(&$el, $crate::fmt::Style::style(&mut s)).expect(concat!(
-                    "failed to format argument `",
-                    stringify!($el),
-                    "`",
-                    $(
-                        " (with style `",
-                        stringify!($style),
-                        "`)",
-                    )?
-                ));
-            )*
-        }};
+        ($($t:tt)*) => {
+            $crate::fmt::_print($crate::format_args!($($t)*))
+        };
     }
 
     #[macro_export]
     macro_rules! println {
-        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {
-            $crate::print!($( $el $( => $style )?, )* '\n')
+        ($($t:tt)*) => {
+            $crate::fmt::_print($crate::format_args_nl!($($t)*))
         };
     }
 
     #[macro_export]
     macro_rules! eprint {
-        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {{
-            let mut s = ::std::io::stderr().lock();
-            $(
-                $crate::fmt::Format::<
-                    $crate::_if_else!([$($style)?] else [$crate::fmt::Display])
-                >::fmt(&$el, $crate::fmt::Style::style(&mut s)).expect(concat!(
-                    "failed to format argument `",
-                    stringify!($el),
-                    "`",
-                    $(
-                        " (with style `",
-                        stringify!($style),
-                        "`)",
-                    )?
-                ));
-            )*
-        }};
+        ($($t:tt)*) => {
+            $crate::fmt::_eprint($crate::format_args!($($t)*))
+        };
     }
 
     #[macro_export]
     macro_rules! eprintln {
-        ( $( $el:expr $( => $style:path )? ),* $(,)? ) => {
-            $crate::eprint!($( $el $( => $style )?, )* '\n')
+        ($($t:tt)*) => {
+            $crate::fmt::_eprint($crate::format_args_nl!($($t)*))
         };
     }
 }
 
+#[doc(hidden)]
 #[macro_export]
 macro_rules! _if_else {
     ( [] else [$($t:tt)*] ) => { $($t)* };

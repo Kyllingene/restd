@@ -16,6 +16,36 @@ pub struct Pad<S> {
     pub style: S,
 }
 
+impl<S: Style> Pad<S> {
+    pub const fn left(with: char, count: usize, style: S) -> Self {
+        Self {
+            align: Dir::Left,
+            with,
+            count,
+            style,
+        }
+    }
+
+    pub const fn center(with: char, count: usize, style: S) -> Self {
+        Self {
+            align: Dir::Center,
+            with,
+            count,
+            style,
+        }
+    }
+
+    pub const fn right(with: char, count: usize, style: S) -> Self {
+        Self {
+            align: Dir::Right,
+            with,
+            count,
+            style,
+        }
+    }
+
+}
+
 impl<S: Style> Style for Pad<S> {}
 
 impl<S: Style> Modifier for Pad<S> {

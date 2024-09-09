@@ -1,14 +1,13 @@
-#![allow(warnings)]
 use super::{Debug, Display, Pad, Dir, Format};
-use crate::format_args;
+use crate::format;
 
 #[test]
-fn format_args() {
+fn format() {
     let x = 'x';
     let y = "foobar".to_string();
     let z = 123456_u32;
 
-    let args = format_args!(
+    let f = format!(
         x,
 
         " ",
@@ -17,22 +16,20 @@ fn format_args() {
 
         ' ',
 
-        z as Pad {
-            align: Dir::Right,
-            with: '0',
-            count: 9,
-            style: Display,
-        },
+        z as Pad::right(
+            '0',
+            9,
+            Display,
+        ),
 
         r##" "##,
 
-        { 123 }
+        { 123 + 456 },
+        { 0x20 as char },
+        { &y.as_str()[3..] }
     );
 
-    let mut f = String::new();
-    args.write(&mut f).unwrap();
-
-    assert_eq!(f, "x \"foobar\" 000123456 123");
+    assert_eq!(f, "x \"foobar\" 000123456 579 bar");
 }
 
 #[test]
@@ -48,21 +45,6 @@ fn integer() {
     assert_eq!(f, "123\n-456");
 }
 
-// #[test]
-// fn normal_str() {
-//     let display = format!("Hello, World!");
-//     assert_eq!(display, "Hello, World!");
-
-//     let debug = format!("Hello, World!" => Debug);
-//     assert_eq!(debug, "\"Hello, World!\"");
-// }
-
-// #[test]
-// fn format_multiple_args() {
-//     let multiple = format!(() => Debug, " foobar ", 'T');
-//     assert_eq!(multiple, "() foobar T");
-// }
-
 #[test]
 fn manual_args() {
     use crate::fmt::args::*;
@@ -70,12 +52,13 @@ fn manual_args() {
     let x = 'x';
     let y = "foobar".to_string();
 
-    let args = Arguments([
+    let slice = [
         Var::new(&"hello, world!\n", &Display),
         Var::new(&x, &Display),
         Var::new(&" ", &Display),
         Var::new(&y, &Debug),
-    ]);
+    ];
+    let args = Arguments(&slice[..]);
 
     let mut f = String::new();
     args.write(&mut f).unwrap();
@@ -100,11 +83,12 @@ fn manual_pad() {
         style: Display,
     };
 
-    let args = Arguments([
+    let slice = [
         Var::new(&"foobar", &rpad),
         Var::new(&'\n', &Display),
         Var::new(&"longer-string", &lpad),
-    ]);
+    ];
+    let args = Arguments(&slice[..]);
 
     let mut f = String::new();
     args.write(&mut f).unwrap();

@@ -88,6 +88,26 @@ mod with_std {
         }
     }
 
+    impl Write for io::Stderr {
+        fn write(&mut self, buf: &[u8]) -> Result<usize> {
+            io::Write::write(self, buf).map_err(|e| from_write_err(e.kind()))
+        }
+
+        fn flush(&mut self) -> Result<()> {
+            io::Write::flush(self).map_err(|e| from_write_err(e.kind()))
+        }
+    }
+
+    impl Write for io::StderrLock<'_> {
+        fn write(&mut self, buf: &[u8]) -> Result<usize> {
+            io::Write::write(self, buf).map_err(|e| from_write_err(e.kind()))
+        }
+
+        fn flush(&mut self) -> Result<()> {
+            io::Write::flush(self).map_err(|e| from_write_err(e.kind()))
+        }
+    }
+
     pub fn to_io(e: io::ErrorKind) -> ReadResult {
         Err(match e {
             io::ErrorKind::NotFound => Error::NotFound,
