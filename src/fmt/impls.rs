@@ -1,4 +1,4 @@
-use super::{Debug, Display, Format, Result, Style, Pretty, Write};
+use super::{Debug, Display, Format, Hex, Pretty, Result, Style, Write};
 
 crate::stylable![(), str, char,];
 crate::stylable!(for(T: Format<Debug>) [T]);
@@ -131,6 +131,43 @@ macro_rules! impl_int {
                 self.fmt(f, &Debug)
             }
         }
+
+        impl Format<Hex> for $t {
+            fn fmt(&self, f: &mut dyn Write, s: &Hex) -> Result {
+                // this will get optimized out for unsigned anyways
+                #[allow(unused_comparisons)]
+                let mut x = if *self < 0 {
+                    f.write_char('-')?;
+
+                    // to get around unsigned integers having no Neg
+                    (!*self) + 1
+                } else {
+                    *self
+                };
+
+                let mut digits = [0_u8; 40];
+                let mut i = 0;
+
+                digits[i] = (x % 16) as u8;
+                x /= 16;
+                i += 1;
+
+                while x > 0 {
+                    digits[i] = (x % 16) as u8;
+                    x /= 16;
+                    i += 1;
+                }
+
+                while i > 0 {
+                    i -= 1;
+                    let x = digits[i];
+                    let ch = (if x < 10 { b'0' } else if s.0 { b'A' - 10 } else { b'a' - 10 } + x) as char;
+                    f.write_char(ch)?;
+                }
+
+                Ok(())
+            }
+        }
     )*};
 }
 impl_int![u8, u16, u32, u64, usize, i8, i16, i32, i64, isize];
@@ -204,7 +241,7 @@ where
 
 #[cfg(any(test, feature = "std"))]
 mod with_std {
-    use crate::fmt::{Debug, Display, Format, Result, Write, Pretty};
+    use crate::fmt::{Debug, Display, Format, Pretty, Result, Write};
 
     crate::stylable![String];
     crate::stylable!(for(T: Format<Debug>) Vec<T>);

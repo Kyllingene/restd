@@ -1,4 +1,4 @@
-use super::{Debug, Dir, Display, Format, Pad, Pretty, Result, Write};
+use super::{Debug, Dir, Display, Format, Hex, Pad, Pretty, Result, Write};
 use crate::format;
 
 #[test]
@@ -171,4 +171,12 @@ fn pretty_helpers() {
     ],
 }"#;
     assert_eq!(f, ex);
+}
+
+#[test]
+fn hex() {
+    let x = 0x1a23_u32;
+    let y = 0x0123456789abcdef_u64;
+    let f = format!(x as Hex(false), ' ', y as Hex(true));
+    assert_eq!(f, "1a23 123456789ABCDEF");
 }

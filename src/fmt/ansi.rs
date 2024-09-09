@@ -1,4 +1,4 @@
-use super::{Format, Modifier, Result, Style, Write, Display};
+use super::{Display, Format, Modifier, Result, Style, Write};
 
 pub const RESET: &str = "\x1b[0m";
 

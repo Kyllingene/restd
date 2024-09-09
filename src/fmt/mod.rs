@@ -1,3 +1,4 @@
+pub mod ansi;
 pub mod args;
 mod debug;
 mod display;
@@ -6,7 +7,6 @@ mod impls;
 mod macros;
 mod pad;
 mod pretty;
-pub mod ansi;
 
 #[cfg(test)]
 mod test;
@@ -15,6 +15,7 @@ pub type Result = core::result::Result<(), Error>;
 
 pub use debug::Debug;
 pub use display::Display;
+pub use hex::Hex;
 pub use pad::{Dir, Pad};
 pub use pretty::Pretty;
 
