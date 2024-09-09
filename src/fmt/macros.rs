@@ -1,3 +1,42 @@
+#[macro_export]
+macro_rules! format_args {
+    () => {
+        $crate::fmt::args::Arguments(&[])
+    };
+
+    ($(
+        $(  $el_id:ident   )?
+        $(  $el_li:literal )?
+        $({ $el_ex:expr   })?
+        
+        $( as
+            $style:ident
+                $(< $($gens:tt)* >)?
+                $(( $($tpl_args:tt)* ))?
+                $({ $($sct_args:tt)* })?
+        )?
+    ),* $(,)?) => {{
+        $crate::fmt::args::Arguments([$(
+            $crate::fmt::args::Var::new(
+                $(&$el_id,)?
+                $(&$el_li,)?
+                $(&$el_ex,)?
+
+                $crate::_if_else!(
+                    [$(
+                        &$style
+                            $(< $($gens)* >)?
+                            $(( $($tpl_args)* ))?
+                            $({ $($sct_args)* })?
+                    )?]
+                    else
+                    [&$crate::fmt::Display]
+                )
+            ),
+        )*])
+    }};
+}
+
 #[cfg(any(feature = "std", test))]
 mod with_std {
     #[macro_export]

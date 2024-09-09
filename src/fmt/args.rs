@@ -2,11 +2,11 @@ use core::marker::PhantomData;
 
 use super::{Format, Result, Style, Write};
 
-pub struct Arguments<'a>(pub &'a [Var<'a>]);
+pub struct Arguments<'a, const N: usize>(pub [Var<'a>; N]);
 
-impl Arguments<'_> {
+impl<const N: usize> Arguments<'_, N> {
     pub fn write(&self, f: &mut dyn Write) -> Result {
-        for var in self.0 {
+        for var in &self.0 {
             var.call(f)?;
         }
 

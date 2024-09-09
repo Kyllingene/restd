@@ -8,9 +8,10 @@ pub enum Dir {
     Right,
 }
 
+// TODO: should this support arbitrary str padding?
 pub struct Pad<S> {
     pub align: Dir,
-    pub ch: char,
+    pub with: char,
     pub count: usize,
     pub style: S,
 }
@@ -32,13 +33,13 @@ impl<S: Style> Modifier for Pad<S> {
             Dir::Left => {
                 data.fmt(f, &self.style)?;
                 for _ in 0..chs {
-                    f.write_char(self.ch)?;
+                    f.write_char(self.with)?;
                 }
             }
             Dir::Center => todo!(),
             Dir::Right => {
                 for _ in 0..chs {
-                    f.write_char(self.ch)?;
+                    f.write_char(self.with)?;
                 }
                 data.fmt(f, &self.style)?;
             }

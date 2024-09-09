@@ -27,6 +27,7 @@ pub trait Modifier: Style {
         T: Format<Self::Inner> + ?Sized;
 }
 
+// TODO: make this work
 // impl<T, M> Format<M> for T
 // where
 //     T: Format<M::Inner>,
