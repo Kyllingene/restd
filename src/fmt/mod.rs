@@ -5,6 +5,8 @@ mod hex;
 mod impls;
 mod macros;
 mod pad;
+mod pretty;
+pub mod ansi;
 
 #[cfg(test)]
 mod test;
@@ -14,6 +16,7 @@ pub type Result = core::result::Result<(), Error>;
 pub use debug::Debug;
 pub use display::Display;
 pub use pad::{Dir, Pad};
+pub use pretty::Pretty;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Error;
@@ -27,7 +30,7 @@ pub trait Modifier: Style {
         T: Format<Self::Inner> + ?Sized;
 }
 
-// TODO: make this work
+// TODO: can any form of this work?
 // impl<T, M> Format<M> for T
 // where
 //     T: Format<M::Inner>,
@@ -40,6 +43,13 @@ pub trait Modifier: Style {
 
 pub trait Format<S: Style> {
     fn fmt(&self, f: &mut dyn Write, style: &S) -> Result;
+
+    #[cfg(any(feature = "std", test))]
+    fn stringify(&self, style: &S) -> String {
+        let mut f = String::new();
+        self.fmt(&mut f, style).unwrap();
+        f
+    }
 }
 
 pub trait Write {
@@ -103,13 +113,17 @@ macro_rules! stylable {
 #[doc(hidden)]
 #[cfg(any(feature = "std", test))]
 pub fn _print(args: args::Arguments<'_>) {
-    crate::io::IoFmt(std::io::stdout()).write_args(args).unwrap();
+    crate::io::IoFmt(std::io::stdout())
+        .write_args(args)
+        .unwrap();
 }
 
 #[doc(hidden)]
 #[cfg(any(feature = "std", test))]
 pub fn _eprint(args: args::Arguments<'_>) {
-    crate::io::IoFmt(std::io::stderr()).write_args(args).unwrap();
+    crate::io::IoFmt(std::io::stderr())
+        .write_args(args)
+        .unwrap();
 }
 
 #[doc(hidden)]

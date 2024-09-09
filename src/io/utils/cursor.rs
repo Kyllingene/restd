@@ -3,7 +3,7 @@ use crate::io::{Error, Read, ReadResult, Result, Seek, Write};
 /// A moving cursor over a slice of bytes.
 ///
 /// Reading and writing both move forward in the data: if you don't want this,
-/// consider using [`Buffer`](super::Buffer) instead.
+/// consider using [`Buffer`](crate::io::Buffer) instead.
 pub struct Cursor<A> {
     data: A,
     idx: usize,

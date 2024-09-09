@@ -1,4 +1,4 @@
-use super::{Debug, Display, Pad, Dir, Format};
+use super::{Debug, Dir, Display, Format, Pad, Pretty, Result, Write};
 use crate::format;
 
 #[test]
@@ -94,4 +94,81 @@ fn manual_pad() {
     args.write(&mut f).unwrap();
 
     assert_eq!(f, "      foobar\nlonger-string");
+}
+
+#[test]
+fn debug_helpers() {
+    struct Foo(u32, &'static str);
+    struct Bar {
+        foo: Foo,
+        bar: [char; 3],
+    }
+
+    impl Format<Debug> for Foo {
+        fn fmt(&self, f: &mut dyn Write, s: &Debug) -> Result {
+            s.dbg_tuple(f, "Foo").field(&self.0).field(&self.1).finish()
+        }
+    }
+
+    impl Format<Debug> for Bar {
+        fn fmt(&self, f: &mut dyn Write, s: &Debug) -> Result {
+            s.dbg_struct(f, "Bar")
+                .field("foo", &self.foo)
+                .field("bar", &self.bar)
+                .finish()
+        }
+    }
+
+    let foo = Foo(123, "foo");
+    let bar = Bar {
+        foo,
+        bar: ['b', 'a', 'r'],
+    };
+
+    let f = bar.stringify(&Debug);
+    assert_eq!(f, r#"Bar { foo: Foo(123, "foo"), bar: ['b', 'a', 'r'] }"#);
+}
+
+#[test]
+fn pretty_helpers() {
+    struct Foo(u32, &'static str);
+    struct Bar {
+        foo: Foo,
+        bar: [char; 3],
+    }
+
+    impl Format<Pretty> for Foo {
+        fn fmt(&self, f: &mut dyn Write, s: &Pretty) -> Result {
+            s.dbg_tuple(f, "Foo").field(&self.0).field(&self.1).finish()
+        }
+    }
+
+    impl Format<Pretty> for Bar {
+        fn fmt(&self, f: &mut dyn Write, s: &Pretty) -> Result {
+            s.dbg_struct(f, "Bar")
+                .field("foo", &self.foo)
+                .field("bar", &self.bar)
+                .finish()
+        }
+    }
+
+    let foo = Foo(123, "foo");
+    let bar = Bar {
+        foo,
+        bar: ['b', 'a', 'r'],
+    };
+
+    let f = bar.stringify(&Pretty(0));
+    let ex = r#"Bar {
+    foo: Foo(
+        123,
+        "foo",
+    ),
+    bar: [
+        'b',
+        'a',
+        'r',
+    ],
+}"#;
+    assert_eq!(f, ex);
 }

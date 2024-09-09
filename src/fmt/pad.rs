@@ -1,4 +1,4 @@
-use super::{Result, Style, Format, Write, Modifier};
+use super::{Format, Modifier, Result, Style, Write};
 use crate::io::Counter;
 
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
@@ -43,7 +43,6 @@ impl<S: Style> Pad<S> {
             style,
         }
     }
-
 }
 
 impl<S: Style> Style for Pad<S> {}

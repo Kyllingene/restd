@@ -1,11 +1,8 @@
-use super::{Debug, Display, Format, Result, Style, Write};
+use super::{Debug, Display, Format, Result, Style, Pretty, Write};
 
-crate::stylable![
-    (),
-    str,
-    char,
-];
+crate::stylable![(), str, char,];
 crate::stylable!(for(T: Format<Debug>) [T]);
+crate::stylable!(for(T: Format<Debug>, const N: usize) [T; N]);
 
 fn dbg_char(ch: char, f: &mut dyn Write) -> Result {
     if ch == '\'' {
@@ -55,6 +52,12 @@ impl Format<Display> for str {
     }
 }
 
+impl Format<Pretty> for str {
+    fn fmt(&self, f: &mut dyn Write, _: &Pretty) -> Result {
+        self.fmt(f, &Debug)
+    }
+}
+
 impl Format<Debug> for char {
     fn fmt(&self, f: &mut dyn Write, _: &Debug) -> Result {
         f.write_char('\'')?;
@@ -68,6 +71,12 @@ impl Format<Debug> for char {
 impl Format<Display> for char {
     fn fmt(&self, f: &mut dyn Write, _: &Display) -> Result {
         f.write_char(*self)
+    }
+}
+
+impl Format<Pretty> for char {
+    fn fmt(&self, f: &mut dyn Write, _: &Pretty) -> Result {
+        self.fmt(f, &Debug)
     }
 }
 
@@ -116,12 +125,15 @@ macro_rules! impl_int {
                 <$t as Format<Debug>>::fmt(self, f, &Debug)
             }
         }
+
+        impl Format<Pretty> for $t {
+            fn fmt(&self, f: &mut dyn Write, _: &Pretty) -> Result {
+                <$t as Format<Debug>>::fmt(self, f, &Debug)
+            }
+        }
     )*};
 }
-impl_int![
-    u8, u16, u32, u64, usize,
-    i8, i16, i32, i64, isize
-];
+impl_int![u8, u16, u32, u64, usize, i8, i16, i32, i64, isize];
 
 impl<T> Format<Debug> for [T]
 where
@@ -145,9 +157,54 @@ where
     }
 }
 
+impl<T> Format<Pretty> for [T]
+where
+    T: Format<Pretty>,
+{
+    fn fmt(&self, f: &mut dyn Write, s: &Pretty) -> Result {
+        f.write_char('[')?;
+
+        let nl = |f: &mut dyn Write, d| {
+            f.write_char('\n')?;
+            for _ in 0..d {
+                f.write_str("    ")?;
+            }
+            Ok(())
+        };
+
+        for x in self {
+            let d = s.0 + 1;
+            nl(f, d)?;
+            x.fmt(f, &Pretty(d))?;
+            f.write_char(',')?;
+        }
+
+        nl(f, s.0)?;
+        f.write_char(']')
+    }
+}
+
+impl<T, const N: usize> Format<Debug> for [T; N]
+where
+    T: Format<Debug>,
+{
+    fn fmt(&self, f: &mut dyn Write, s: &Debug) -> Result {
+        self.as_slice().fmt(f, s)
+    }
+}
+
+impl<T, const N: usize> Format<Pretty> for [T; N]
+where
+    T: Format<Pretty>,
+{
+    fn fmt(&self, f: &mut dyn Write, s: &Pretty) -> Result {
+        self.as_slice().fmt(f, s)
+    }
+}
+
 #[cfg(any(test, feature = "std"))]
 mod with_std {
-    use crate::fmt::{Debug, Display, Format, Write, Result};
+    use crate::fmt::{Debug, Display, Format, Result, Write, Pretty};
 
     crate::stylable![String];
     crate::stylable!(for(T: Format<Debug>) Vec<T>);
@@ -164,11 +221,26 @@ mod with_std {
         }
     }
 
+    impl Format<Pretty> for String {
+        fn fmt(&self, f: &mut dyn Write, s: &Pretty) -> Result {
+            self.as_str().fmt(f, s)
+        }
+    }
+
     impl<T> Format<Debug> for Vec<T>
     where
         T: Format<Debug>,
     {
         fn fmt(&self, f: &mut dyn Write, s: &Debug) -> Result {
+            self.as_slice().fmt(f, s)
+        }
+    }
+
+    impl<T> Format<Pretty> for Vec<T>
+    where
+        T: Format<Pretty>,
+    {
+        fn fmt(&self, f: &mut dyn Write, s: &Pretty) -> Result {
             self.as_slice().fmt(f, s)
         }
     }

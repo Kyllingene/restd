@@ -8,12 +8,12 @@ macro_rules! format_args {
         $(  $el_id:ident   )?
         $(  $el_li:literal )?
         $({ $el_ex:expr   })?
-        
+
         $( as
             $style:ident
                 $(:: $(@ $gens_colon:tt)?)?
                 $(< $($gens:tt)* >)?
-                $(:: $assoc:ident)?
+                $(:: $assoc:ident)*
                 $(( $($tpl_args:tt)* ))?
                 $({ $($sct_args:tt)* })?
         )?
@@ -29,7 +29,7 @@ macro_rules! format_args {
                         &$style
                             $(:: $($gens_colon)?)?
                             $(< $($gens)* >)?
-                            $(:: $assoc)?
+                            $(:: $assoc)*
                             $(( $($tpl_args)* ))?
                             $({ $($sct_args)* })?
                     )?]
@@ -51,12 +51,12 @@ macro_rules! format_args_nl {
         $(  $el_id:ident   )?
         $(  $el_li:literal )?
         $({ $el_ex:expr   })?
-        
+
         $( as
             $style:ident
                 $(:: $(@ $gens_colon:tt)?)?
                 $(< $($gens:tt)* >)?
-                $(:: $assoc:ident)?
+                $(:: $assoc:ident)*
                 $(( $($tpl_args:tt)* ))?
                 $({ $($sct_args:tt)* })?
         )?
@@ -72,7 +72,7 @@ macro_rules! format_args_nl {
                         &$style
                             $(:: $($gens_colon)?)?
                             $(< $($gens)* >)?
-                            $(:: $assoc)?
+                            $(:: $assoc)*
                             $(( $($tpl_args)* ))?
                             $({ $($sct_args)* })?
                     )?]
@@ -139,6 +139,29 @@ mod with_std {
         ($($t:tt)*) => {
             $crate::fmt::_eprint($crate::format_args_nl!($($t)*))
         };
+    }
+
+    #[macro_export]
+    macro_rules! dbg {
+        ($($x:expr),+ $(,)?) => {($(
+            match $x {
+                x => {
+                    $crate::eprintln!(
+                        "[",
+                        { ::core::file!() },
+                        ":",
+                        { ::core::line!() },
+                        ":",
+                        { ::core::column!() },
+                        "] ",
+                        { ::core::stringify!($x) },
+                        " = ",
+                        x as $crate::fmt::Pretty(0)
+                    );
+                    x
+                }
+            }
+        ),+)};
     }
 }
 

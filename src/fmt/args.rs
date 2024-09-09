@@ -42,9 +42,7 @@ impl<'a> Var<'a> {
 
             #[allow(clippy::missing_transmute_annotations)]
             func: unsafe {
-                core::mem::transmute(
-                    <T as Format<S>>::fmt as fn(&T, &mut dyn Write, &S) -> Result,
-                )
+                core::mem::transmute(<T as Format<S>>::fmt as fn(&T, &mut dyn Write, &S) -> Result)
             },
 
             _lt: PhantomData,
