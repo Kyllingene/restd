@@ -122,13 +122,13 @@ macro_rules! impl_int {
 
         impl Format<Display> for $t {
             fn fmt(&self, f: &mut dyn Write, _: &Display) -> Result {
-                <$t as Format<Debug>>::fmt(self, f, &Debug)
+                self.fmt(f, &Debug)
             }
         }
 
         impl Format<Pretty> for $t {
             fn fmt(&self, f: &mut dyn Write, _: &Pretty) -> Result {
-                <$t as Format<Debug>>::fmt(self, f, &Debug)
+                self.fmt(f, &Debug)
             }
         }
     )*};
