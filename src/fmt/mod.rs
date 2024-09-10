@@ -7,6 +7,7 @@ mod impls;
 mod macros;
 mod pad;
 mod pretty;
+mod adapters;
 
 #[cfg(test)]
 mod test;
@@ -18,6 +19,7 @@ pub use display::Display;
 pub use hex::Hex;
 pub use pad::{Dir, Pad};
 pub use pretty::Pretty;
+pub use adapters::{StdDebug, StdDisplay, StdWrite};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Error;
@@ -64,6 +66,16 @@ pub trait Write {
         Self: Sized,
     {
         args.write(self)
+    }
+}
+
+impl Write for &mut dyn Write {
+    fn write_str(&mut self, data: &str) -> Result {
+        (*self).write_str(data)
+    }
+
+    fn write_char(&mut self, data: char) -> Result {
+        (*self).write_char(data)
     }
 }
 

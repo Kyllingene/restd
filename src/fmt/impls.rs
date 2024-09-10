@@ -1,4 +1,4 @@
-use super::{Debug, Display, Format, Hex, Pretty, Result, Style, Write};
+use super::{Debug, Display, Format, Hex, Pretty, Result, Style, Write, StdDebug};
 
 crate::stylable![(), str, char,];
 crate::stylable!(for(T: Format<Debug>) [T]);
@@ -171,6 +171,42 @@ macro_rules! impl_int {
     )*};
 }
 impl_int![u8, u16, u32, u64, usize, i8, i16, i32, i64, isize];
+
+impl Format<Debug> for f32 {
+    fn fmt(&self, f: &mut dyn Write, s: &Debug) -> Result {
+        StdDebug(*self).fmt(f, s)
+    }
+}
+
+impl Format<Display> for f32 {
+    fn fmt(&self, f: &mut dyn Write, _: &Display) -> Result {
+        self.fmt(f, &Debug)
+    }
+}
+
+impl Format<Pretty> for f32 {
+    fn fmt(&self, f: &mut dyn Write, _: &Pretty) -> Result {
+        self.fmt(f, &Debug)
+    }
+}
+
+impl Format<Debug> for f64 {
+    fn fmt(&self, f: &mut dyn Write, s: &Debug) -> Result {
+        StdDebug(*self).fmt(f, s)
+    }
+}
+
+impl Format<Display> for f64 {
+    fn fmt(&self, f: &mut dyn Write, _: &Display) -> Result {
+        self.fmt(f, &Debug)
+    }
+}
+
+impl Format<Pretty> for f64 {
+    fn fmt(&self, f: &mut dyn Write, _: &Pretty) -> Result {
+        self.fmt(f, &Debug)
+    }
+}
 
 impl<T> Format<Debug> for [T]
 where

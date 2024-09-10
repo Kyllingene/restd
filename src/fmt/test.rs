@@ -177,6 +177,18 @@ fn pretty_helpers() {
 fn hex() {
     let x = 0x1a23_u32;
     let y = 0x0123456789abcdef_u64;
+
     let f = format!(x as Hex(false), ' ', y as Hex(true));
     assert_eq!(f, "1a23 123456789ABCDEF");
+}
+
+#[test]
+fn floats() {
+    let x = 123.456_f32;
+    let y = 12345678.87654321_f64;
+
+    assert_eq!(
+        format!(x, ' ', y),
+        std::format!("{x} {y}"),
+    );
 }
