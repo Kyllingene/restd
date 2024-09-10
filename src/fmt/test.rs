@@ -187,8 +187,5 @@ fn floats() {
     let x = 123.456_f32;
     let y = 12345678.87654321_f64;
 
-    assert_eq!(
-        format!(x, ' ', y),
-        std::format!("{x} {y}"),
-    );
+    assert_eq!(format!(x, ' ', y), std::format!("{x} {y}"),);
 }

@@ -1,6 +1,6 @@
-use super::{Debug, Display, Format, Hex, Pretty, Result, Style, Write, StdDebug};
+use super::{Debug, Display, Format, Hex, Pretty, Result, StdDebug, Style, Write};
 
-crate::stylable![(), str, char,];
+crate::stylable![(), str, char, f32, f64];
 crate::stylable!(for(T: Format<Debug>) [T]);
 crate::stylable!(for(T: Format<Debug>, const N: usize) [T; N]);
 

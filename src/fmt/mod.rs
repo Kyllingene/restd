@@ -1,3 +1,4 @@
+mod adapters;
 pub mod ansi;
 pub mod args;
 mod debug;
@@ -7,19 +8,18 @@ mod impls;
 mod macros;
 mod pad;
 mod pretty;
-mod adapters;
 
 #[cfg(test)]
 mod test;
 
 pub type Result = core::result::Result<(), Error>;
 
+pub use adapters::{StdDebug, StdDisplay, StdWrite};
 pub use debug::Debug;
 pub use display::Display;
 pub use hex::Hex;
 pub use pad::{Dir, Pad};
 pub use pretty::Pretty;
-pub use adapters::{StdDebug, StdDisplay, StdWrite};
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Error;

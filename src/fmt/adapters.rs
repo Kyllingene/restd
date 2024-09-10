@@ -1,4 +1,4 @@
-use super::{Debug, Format, Pretty, Display, Result, Write, Error};
+use super::{Debug, Display, Error, Format, Pretty, Result, Write};
 use core::fmt;
 
 pub struct StdDebug<T>(pub T);
