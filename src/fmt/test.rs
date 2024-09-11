@@ -1,4 +1,4 @@
-use super::{Debug, Dir, Display, Format, Hex, Pad, Pretty, Result, Write};
+use super::{Debug, Dir, Display, Format, Hex, Pad, Pretty, Result, Write, Prefix};
 use crate::format;
 
 #[test]
@@ -188,4 +188,75 @@ fn floats() {
     let y = 12345678.87654321_f64;
 
     assert_eq!(format!(x, ' ', y), std::format!("{x} {y}"),);
+}
+
+#[test]
+fn derive() {
+    use crate::{derive, debug};
+
+    struct Foo(u32, &'static str);
+    debug!(struct Foo(x, y as Debug));
+
+    let f = Foo(123, "foo").stringify(&Debug);
+    assert_eq!(f, r#"Foo(123, "foo")"#);
+
+    #[allow(dead_code)]
+    struct Bar {
+        x: u32,
+        y: u32,
+        z: bool,
+    }
+    debug!(struct Bar {
+        x as Prefix("0x", Hex(false)),
+        y as Hex::prefix(true),
+        ...
+    });
+
+    let f = Bar {
+        x: 0xabc,
+        y: 0xDEF,
+        z: false,
+    }.stringify(&Debug);
+    assert_eq!(f, "Bar { x: 0xabc, y: 0xDEF, ... }");
+
+    #[allow(dead_code)]
+    enum Baz {
+        A(u32),
+        B,
+        C { x: f32, y: () },
+    }
+    debug!(enum Baz {
+        A(x as Hex(false)),
+        B,
+        C { x, ... },
+    });
+
+    let f = Baz::A(0x1a2b).stringify(&Debug);
+    assert_eq!(f, "A(1a2b)");
+
+    let f = Baz::B.stringify(&Debug);
+    assert_eq!(f, "B");
+
+    let f = Baz::C { x: 12.34, y: () }.stringify(&Debug);
+    assert_eq!(f, "C { x: 12.34, ... }");
+
+    struct Qux {
+        x: u32,
+        y: [u8; 3],
+    }
+    derive!(Debug + Pretty for struct Qux {
+        x,
+        y,
+    });
+
+    let f = Qux { x: 123, y: [45, 67, 89] }.stringify(&Pretty(0));
+    let ex = r#"Qux {
+    x: 123,
+    y: [
+        45,
+        67,
+        89,
+    ],
+}"#;
+    assert_eq!(f, ex);
 }

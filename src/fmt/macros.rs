@@ -11,8 +11,7 @@ macro_rules! format_args {
 
         $( as
             $style:ident
-                $(:: $(@ $gens_colon:tt)?)?
-                $(< $($gens:tt)* >)?
+                $($(:: $(@ $gens_colon:tt)?)? < $($gens:tt)* >)?
                 $(:: $assoc:ident)*
                 $(( $($tpl_args:tt)* ))?
                 $({ $($sct_args:tt)* })?
@@ -27,8 +26,7 @@ macro_rules! format_args {
                 $crate::_if_else!(
                     [$(
                         &$style
-                            $(:: $($gens_colon)?)?
-                            $(< $($gens)* >)?
+                            $($(:: $(@ $gens_colon)?)? < $($gens)* >)?
                             $(:: $assoc)*
                             $(( $($tpl_args)* ))?
                             $({ $($sct_args)* })?
@@ -54,8 +52,7 @@ macro_rules! format_args_nl {
 
         $( as
             $style:ident
-                $(:: $(@ $gens_colon:tt)?)?
-                $(< $($gens:tt)* >)?
+                $($(:: $(@ $gens_colon:tt)?)? < $($gens:tt)* >)?
                 $(:: $assoc:ident)*
                 $(( $($tpl_args:tt)* ))?
                 $({ $($sct_args:tt)* })?
@@ -70,8 +67,7 @@ macro_rules! format_args_nl {
                 $crate::_if_else!(
                     [$(
                         &$style
-                            $(:: $($gens_colon)?)?
-                            $(< $($gens)* >)?
+                            $($(:: $(@ $gens_colon)?)? < $($gens)* >)?
                             $(:: $assoc)*
                             $(( $($tpl_args)* ))?
                             $({ $($sct_args)* })?
