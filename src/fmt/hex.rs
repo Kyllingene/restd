@@ -1,5 +1,6 @@
 use super::Prefix;
 
+#[derive(Default, Clone, Copy)]
 pub struct Hex(pub bool);
 impl super::Style for Hex {}
 

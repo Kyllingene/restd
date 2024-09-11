@@ -8,8 +8,8 @@ mod hex;
 mod impls;
 mod macros;
 mod pad;
-mod pretty;
 mod prefix;
+mod pretty;
 
 #[cfg(test)]
 mod test;
@@ -21,8 +21,8 @@ pub use debug::Debug;
 pub use display::Display;
 pub use hex::Hex;
 pub use pad::{Dir, Pad};
-pub use pretty::Pretty;
 pub use prefix::Prefix;
+pub use pretty::Pretty;
 
 #[derive(Clone, Copy, Debug, PartialEq, Eq, Hash)]
 pub struct Error;

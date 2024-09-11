@@ -1,5 +1,6 @@
 use super::{Format, Result, Style, Write};
 
+#[derive(Default, Clone, Copy)]
 pub struct Debug;
 impl Style for Debug {}
 

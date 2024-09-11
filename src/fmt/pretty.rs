@@ -1,6 +1,6 @@
 use super::{Format, Result, Style, Write};
 
-#[derive(Default)]
+#[derive(Default, Clone, Copy)]
 pub struct Pretty(pub usize);
 impl Style for Pretty {}
 

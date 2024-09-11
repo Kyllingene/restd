@@ -1,4 +1,4 @@
-use super::{Debug, Dir, Display, Format, Hex, Pad, Pretty, Result, Write, Prefix};
+use super::{Debug, Dir, Display, Format, Hex, Pad, Prefix, Pretty, Result, Write};
 use crate::format;
 
 #[test]
@@ -192,7 +192,7 @@ fn floats() {
 
 #[test]
 fn derive() {
-    use crate::{derive, debug};
+    use crate::{debug, derive};
 
     struct Foo(u32, &'static str);
     debug!(struct Foo(x, y as Debug));
@@ -216,7 +216,8 @@ fn derive() {
         x: 0xabc,
         y: 0xDEF,
         z: false,
-    }.stringify(&Debug);
+    }
+    .stringify(&Debug);
     assert_eq!(f, "Bar { x: 0xabc, y: 0xDEF, ... }");
 
     #[allow(dead_code)]
@@ -249,7 +250,11 @@ fn derive() {
         y,
     });
 
-    let f = Qux { x: 123, y: [45, 67, 89] }.stringify(&Pretty(0));
+    let f = Qux {
+        x: 123,
+        y: [45, 67, 89],
+    }
+    .stringify(&Pretty(0));
     let ex = r#"Qux {
     x: 123,
     y: [

@@ -1,4 +1,4 @@
-use super::{Format, Display, Style, Modifier, Write, Result};
+use super::{Display, Format, Modifier, Result, Style, Write};
 
 pub struct Prefix<P, S>(pub P, pub S);
 
@@ -9,7 +9,7 @@ impl<P: Format<Display>, S: Style> Modifier for Prefix<P, S> {
 
     fn apply<T>(&self, f: &mut dyn Write, data: &T) -> Result
     where
-        T: Format<Self::Inner> + ?Sized
+        T: Format<Self::Inner> + ?Sized,
     {
         self.0.fmt(f, &Display)?;
         data.fmt(f, &self.1)?;
