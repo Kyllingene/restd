@@ -2,7 +2,6 @@ mod adapters;
 pub mod ansi;
 pub mod args;
 mod debug;
-mod derives;
 mod display;
 mod hex;
 mod impls;

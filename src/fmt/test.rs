@@ -159,7 +159,8 @@ fn pretty_helpers() {
     };
 
     let f = bar.stringify(&Pretty(0));
-    let ex = r#"Bar {
+    let ex =
+r#"Bar {
     foo: Foo(
         123,
         "foo",
@@ -192,10 +193,10 @@ fn floats() {
 
 #[test]
 fn derive() {
-    use crate::{debug, derive};
+    use crate::derive;
 
     struct Foo(u32, &'static str);
-    debug!(struct Foo(x, y as Debug));
+    derive!(struct Foo(x, y as Debug));
 
     let f = Foo(123, "foo").stringify(&Debug);
     assert_eq!(f, r#"Foo(123, "foo")"#);
@@ -206,7 +207,7 @@ fn derive() {
         y: u32,
         z: bool,
     }
-    debug!(struct Bar {
+    derive!(struct Bar {
         x as Prefix("0x", Hex(false)),
         y as Hex::prefix(true),
         ...
@@ -226,7 +227,7 @@ fn derive() {
         B,
         C { x: f32, y: () },
     }
-    debug!(enum Baz {
+    derive!(enum Baz {
         A(x as Hex(false)),
         B,
         C { x, ... },
@@ -242,26 +243,23 @@ fn derive() {
     assert_eq!(f, "C { x: 12.34, ... }");
 
     struct Qux {
-        x: u32,
-        y: [u8; 3],
+        x: [f32; 3],
+        y: char,
     }
-    derive!(Debug + Pretty for struct Qux {
+    derive!(struct Qux {
         x,
-        y,
+        y as Display,
     });
-
-    let f = Qux {
-        x: 123,
-        y: [45, 67, 89],
-    }
-    .stringify(&Pretty(0));
-    let ex = r#"Qux {
-    x: 123,
-    y: [
-        45,
-        67,
-        89,
+    
+    let f = Qux { x: [1.23, 4.56, 7.89], y: 'y' }.stringify(&Pretty(0));
+    let ex =
+r#"Qux {
+    x: [
+        1.23,
+        4.56,
+        7.89,
     ],
+    y: y,
 }"#;
     assert_eq!(f, ex);
 }

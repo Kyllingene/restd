@@ -3,6 +3,7 @@
 pub mod co;
 pub mod fmt;
 pub mod io;
+mod derives;
 
 /// The `!` type.
 ///

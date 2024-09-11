@@ -20,14 +20,13 @@
 // derive!(struct Foo(0, 2, 4));
 // ```
 //
-// Any field indices provided get substituted into `self.$field`, and any that
-// aren't are skipped. Easy, intuitive. Not so for tuple variants.
+// Any fields provided get substituted into `self.$field`, and any that aren't
+// are skipped. Easy, intuitive. Not so for tuple variants.
 //
 // Because, with enums variants, we don't get `self` (until variant types,
-// anyways). Instead, we have to bind to each value. So we have to force the
-// user to give us an ident for each field (unpleasant and unintuitive) and use
-// an `_` to explicitly skip fields - even though for struct variants, the user
-// can implicitly ignore fields!
+// anyways). So instead we have to force the user to give us an ident for each
+// field (unpleasant) and use an `_` to explicitly skip fields - even though for
+// struct variants, the user can implicitly ignore fields!
 //
 // Worst of all, to maintain consistency, tuple structs have to be downgraded to
 // this inferior syntax.
@@ -58,7 +57,6 @@ macro_rules! derive {
     };
 }
 
-#[doc(hidden)]
 #[macro_export]
 macro_rules! _do_derive {
     ( $style_name:ident struct $name:ident $(< $($gens:tt)* >)?; ) => {
