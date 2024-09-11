@@ -59,7 +59,7 @@ macro_rules! derive {
 
 #[macro_export]
 macro_rules! _do_derive {
-    ( $style_name:ident struct $name:ident $(< $($gens:tt)* >)?; ) => {
+    ( $style_name:ident struct $name:ident $(< $($gens:tt)* >)? ) => {
         impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
             fn fmt(
                 &self,
@@ -75,15 +75,9 @@ macro_rules! _do_derive {
         struct $name:ident $(< $($gens:tt)* >)? ($(
             $( _ $(@ $skip:tt)? )?
             $( $field:ident
-                $( as
-                    $style:ident
-                        $($(:: $(@ $sty_gens_colon:tt)?)? < $($sty_gens:tt)* >)?
-                        $(:: $assoc:ident)*
-                        $(( $($tpl_args:tt)* ))?
-                        $({ $($sct_args:tt)* })?
-                )?
+                $( as $style:expr )?
             )?
-        ),* $(,)? $(... $(@$non_exhaustive:tt)?)?)
+        ),* , $(... $(@ $non_exhaustive:tt)?)?)
     ) => {
         impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
             fn fmt(
@@ -101,11 +95,7 @@ macro_rules! _do_derive {
                 $($( $crate::_if_else!(
                     [$( f.field_styled(
                         &$field,
-                        &$style
-                            $($(:: $(@ $sty_gens_colon)?)? < $($sty_gens)* > )?
-                            $(:: $assoc)?
-                            $(( $($tpl_args)* ))?
-                            $({ $($sct_args)* })?
+                        &$style,
                     ) )?]
                     else [ f.field(&$field) ]
                 ); )?)*
@@ -119,16 +109,44 @@ macro_rules! _do_derive {
     };
 
     ( $style_name:ident
+        struct $name:ident $(< $($gens:tt)* >)? ($(
+            $( _ $(@ $skip:tt)? )?
+            $( $field:ident
+                $( as $style:expr )?
+            )?
+        ),*)
+    ) => {
+        impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
+            fn fmt(
+                &self,
+                f: &mut dyn $crate::fmt::Write,
+                s: &$crate::fmt::$style_name,
+            ) -> $crate::fmt::Result {
+                let Self($(
+                    $( _ $(@ $skip)? )?
+                    $( $field )?
+                ),*) = self;
+
+                let mut f = s.dbg_tuple(f, stringify!($name));
+
+                $($( $crate::_if_else!(
+                    [$( f.field_styled(
+                        &$field,
+                        &$style,
+                    ) )?]
+                    else [ f.field(&$field) ]
+                ); )?)*
+
+                f.finish()
+            }
+        }
+    };
+
+    ( $style_name:ident
         struct $name:ident $(< $($gens:tt)* >)? {$(
             $field:ident
-            $( as
-                $style:ident
-                    $($(:: $(@ $sty_gens_colon:tt)?)? < $($sty_gens:tt)* >)?
-                    $(:: $assoc:ident)*
-                    $(( $($tpl_args:tt)* ))?
-                    $({ $($sct_args:tt)* })?
-            )?
-        ),* $(,)? $(... $(@ $non_exhaustive:tt)?)?}
+            $( as $style:expr )?
+        ),* , $(... $(@ $non_exhaustive:tt)?)?}
     ) => {
         impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
             fn fmt(
@@ -141,11 +159,7 @@ macro_rules! _do_derive {
                     [$( f.field_styled(
                         stringify!($field),
                         &self.$field,
-                        &$style
-                            $($(:: $(@ $sty_gens_colon)?)? < $($sty_gens)* >)?
-                            $(:: $assoc)*
-                            $(( $($tpl_args)* ))?
-                            $({ $($sct_args)* })?
+                        &$style,
                     ) )?]
                     else [ f.field(stringify!($field), &self.$field) ]
                 );)*
@@ -158,31 +172,46 @@ macro_rules! _do_derive {
         }
     };
 
+    ( $style_name:ident
+        struct $name:ident $(< $($gens:tt)* >)? {$(
+            $field:ident
+            $( as $style:expr )?
+        ),*}
+    ) => {
+        impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
+            fn fmt(
+                &self,
+                f: &mut dyn $crate::fmt::Write,
+                s: &$crate::fmt::$style_name,
+            ) -> $crate::fmt::Result {
+                let mut f = s.dbg_struct(f, stringify!($name));
+                $( $crate::_if_else!(
+                    [$( f.field_styled(
+                        stringify!($field),
+                        &self.$field,
+                        &$style,
+                    ) )?]
+                    else [ f.field(stringify!($field), &self.$field) ]
+                );)*
+
+                f.finish()
+            }
+        }
+    };
+
     ( $style_name:ident enum $name:ident $(< $($gens:tt)* >)? {$(
         $variant:ident
             $(( $(
-                $( _ $(@ $skip:tt)?)?
+                $( _ $(@ $skip:tt)? )?
                 $( $tup_field:ident
-                    $( as
-                        $tup_style:ident
-                            $($(:: $(@ $tup_gens_colon:tt)?)? < $($tup_gens:tt)* >)?
-                            $(:: $tup_assoc:ident)*
-                            $(( $($tup_tpl_args:tt)* ))?
-                            $({ $($tup_sct_args:tt)* })?
-                    )?
+                    $( as $tup_style:expr )?
                 )?
-            ),* $(,)? $(... $(@ $tup_non_exhaustive:tt)?)? ))?
+            ),* $( , ... $(@ $tup_non_exhaustive:tt)? )? ))?
 
             $({ $(
                 $sct_field:ident
-                $( as
-                    $sct_style:ident
-                        $($(:: $(@ $sct_gens_colon:tt)?)? < $($sct_gens:tt)* >)?
-                        $(:: $sct_assoc:ident)*
-                        $(( $($sct_tpl_args:tt)* ))?
-                        $({ $($sct_sct_args:tt)* })?
-                )?
-            ),* $(,)? $(... $(@ $sct_non_exhaustive:tt)?)? })?
+                $( as $sct_style:expr )?
+            ),* $( , $(... $(@ $sct_non_exhaustive:tt)?)? )? })?
     ),* $(,)?} ) => {
         impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
             fn fmt(
@@ -192,58 +221,54 @@ macro_rules! _do_derive {
             ) -> $crate::fmt::Result {
                 match self {$(
                     Self::$variant
-                        $(($( $($tup_field)? $(_ $(@ $skip)?)? ),*))?
-                        $({$( $sct_field, )* ..})?
+                        $(( $(
+                            $( _ $(@ $skip)? )?
+                            $( $tup_field )?
+                        ),* ))?
+
+                        $({ $(
+                            $sct_field,
+                        )* .. })?
                     => {
                         $crate::_if_else!([
                             $({
                                 let mut f = s.dbg_tuple(f, stringify!($variant));
+
                                 $($( $crate::_if_else!(
-                                    [$(
-                                        f.field_styled(
-                                            &$tup_field,
-                                            &$tup_style
-                                                $($(:: $($tup_gens_colon)?)? < $($tup_gens)* >)?
-                                                $(:: $tup_assoc)?
-                                                $(( $($tup_tpl_args)* ))?
-                                                $({ $($tup_sct_args)* })?
-                                        )
-                                    )?]
-                                    else [f.field(&$tup_field)]
+                                    [$( f.field_styled(
+                                        &$tup_field,
+                                        &$tup_style,
+                                    ) )?]
+                                    else [ f.field(&$tup_field) ]
                                 ); )?)*
 
                                 $crate::_if_else!(
-                                    [$( f.non_exhaustive() $(@ $tup_non_exhaustive)? )?]
+                                    [$($( f.non_exhaustive() $(@ $tup_non_exhaustive)? )?)?]
                                     else [ f.finish() ]
                                 )
                             })?
 
                             $({
                                 let mut f = s.dbg_struct(f, stringify!($variant));
-                                $($crate::_if_else!(
-                                    [$(
-                                        f.field_styled(
-                                            stringify!($sct_field),
-                                            &$sct_field,
-                                            &$sct_style
-                                                $($(:: $($sct_gens_colon)?)? < $($sct_gens)* >)?
-                                                $(:: $sct_assoc)?
-                                                $(( $($sct_tpl_args)* ))?
-                                                $({ $($sct_sct_args)* })?
-                                        )
-                                    )?]
-                                    else [f.field(stringify!($sct_field), &$sct_field)]
-                                );)*
+
+                                $( $crate::_if_else!(
+                                    [$( f.field_styled(
+                                        stringify!($sct_field),
+                                        &$sct_field,
+                                        &$sct_style,
+                                    ) )?]
+                                    else [ f.field(stringify!($sct_field), &$sct_field) ]
+                                ); )*
 
                                 $crate::_if_else!(
-                                    [$( f.non_exhaustive() $(@ $sct_non_exhaustive)? )?]
+                                    [$($( f.non_exhaustive() $(@ $sct_non_exhaustive)? )?)?]
                                     else [ f.finish() ]
                                 )
                             })?
                         ] else [
                             $crate::fmt::Write::write_str(f, stringify!($variant))
                         ])
-                    },
+                    }
                 )*}
             }
         }

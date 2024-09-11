@@ -8,15 +8,22 @@ macro_rules! format_args {
         $(  $el_id:ident   )?
         $(  $el_li:literal )?
         $({ $el_ex:expr   })?
+        $( as $style:expr )?
+    ),+ ,) => {
+        $crate::format_args!($(
+            $( $el_id )?
+            $( $el_li )?
+            $( { $el_ex } )?
+            $( as $style )?
+        ),+)
+    };
 
-        $( as
-            $style:ident
-                $($(:: $(@ $gens_colon:tt)?)? < $($gens:tt)* >)?
-                $(:: $assoc:ident)*
-                $(( $($tpl_args:tt)* ))?
-                $({ $($sct_args:tt)* })?
-        )?
-    ),+ $(,)?) => {
+    ($(
+        $(  $el_id:ident   )?
+        $(  $el_li:literal )?
+        $({ $el_ex:expr   })?
+        $( as $style:expr )?
+    ),+) => {
         $crate::fmt::args::Arguments(&[$(
             $crate::fmt::args::Var::new(
                 $(&$el_id,)?
@@ -24,13 +31,7 @@ macro_rules! format_args {
                 $(&$el_ex,)?
 
                 $crate::_if_else!(
-                    [$(
-                        &$style
-                            $($(:: $(@ $gens_colon)?)? < $($gens)* >)?
-                            $(:: $assoc)*
-                            $(( $($tpl_args)* ))?
-                            $({ $($sct_args)* })?
-                    )?]
+                    [$( &$style )?]
                     else
                     [&$crate::fmt::Display]
                 )
@@ -49,15 +50,22 @@ macro_rules! format_args_nl {
         $(  $el_id:ident   )?
         $(  $el_li:literal )?
         $({ $el_ex:expr   })?
+        $( as $style:expr )?
+    ),+ ,) => {
+        $crate::format_args_nl!($(
+            $( $el_id )?
+            $( $el_li )?
+            $( { $el_ex } )?
+            $( as $style )?
+        ),+)
+    };
 
-        $( as
-            $style:ident
-                $($(:: $(@ $gens_colon:tt)?)? < $($gens:tt)* >)?
-                $(:: $assoc:ident)*
-                $(( $($tpl_args:tt)* ))?
-                $({ $($sct_args:tt)* })?
-        )?
-    ),+ $(,)?) => {
+    ($(
+        $(  $el_id:ident   )?
+        $(  $el_li:literal )?
+        $({ $el_ex:expr   })?
+        $( as $style:expr )?
+    ),+) => {
         $crate::fmt::args::Arguments(&[$(
             $crate::fmt::args::Var::new(
                 $(&$el_id,)?
@@ -65,13 +73,7 @@ macro_rules! format_args_nl {
                 $(&$el_ex,)?
 
                 $crate::_if_else!(
-                    [$(
-                        &$style
-                            $($(:: $(@ $gens_colon)?)? < $($gens)* >)?
-                            $(:: $assoc)*
-                            $(( $($tpl_args)* ))?
-                            $({ $($sct_args)* })?
-                    )?]
+                    [$( &$style )?]
                     else
                     [&$crate::fmt::Display]
                 )

@@ -1,19 +1,25 @@
 use super::{Debug, Display, Format, Hex, Pretty, Result, StdDebug, Style, Write};
 
-crate::stylable![(), str, char, f32, f64];
+crate::stylable![(), str, char, f32, f64, bool];
 crate::stylable!(for(T: Format<Debug>) [T]);
 crate::stylable!(for(T: Format<Debug>, const N: usize) [T; N]);
 
 fn dbg_char(ch: char, f: &mut dyn Write) -> Result {
     if ch == '\'' {
-        f.write_str("\\'")?;
+        f.write_str("\\'")
+    } else if ch == '\0' {
+        f.write_str("\\0")
+    } else if ch == '\n' {
+        f.write_str("\\n")
+    } else if ch == '\t' {
+        f.write_str("\\t")
     } else if ch.is_control() {
-        todo!()
+        f.write_str("\\u{")?;
+        (ch as u32).fmt(f, &(Hex(false)))?;
+        f.write_char('}')
     } else {
-        f.write_char(ch)?;
+        f.write_char(ch)
     }
-
-    Ok(())
 }
 
 impl<T, S> Format<S> for &'_ T
@@ -77,6 +83,18 @@ impl Format<Display> for char {
 impl Format<Pretty> for char {
     fn fmt(&self, f: &mut dyn Write, _: &Pretty) -> Result {
         self.fmt(f, &Debug)
+    }
+}
+
+impl Format<Debug> for bool {
+    fn fmt(&self, f: &mut dyn Write, _: &Debug) -> Result {
+        f.write_str(if *self { "true" } else { "false" })
+    }
+}
+
+impl Format<Pretty> for bool {
+    fn fmt(&self, f: &mut dyn Write, _: &Pretty) -> Result {
+        f.write_str(if *self { "true" } else { "false" })
     }
 }
 

@@ -26,7 +26,7 @@ fn format() {
 
         { 123 + 456 },
         { 0x20 as char },
-        { &y.as_str()[3..] }
+        { &y.as_str()[3..] },
     );
 
     assert_eq!(f, "x \"foobar\" 000123456 579 bar");
@@ -38,9 +38,9 @@ fn integer() {
     let y = -456_isize;
 
     let mut f = String::new();
-    <u8 as Format<Display>>::fmt(&x, &mut f, &Display).unwrap();
+    x.fmt(&mut f, &Display).unwrap();
     f.push('\n');
-    <isize as Format<Debug>>::fmt(&y, &mut f, &Debug).unwrap();
+    y.fmt(&mut f, &Debug).unwrap();
 
     assert_eq!(f, "123\n-456");
 }
@@ -196,7 +196,7 @@ fn derive() {
     use crate::derive;
 
     struct Foo(u32, &'static str);
-    derive!(struct Foo(x, y as Debug));
+    derive!(struct Foo(x, y as Debug,));
 
     let f = Foo(123, "foo").stringify(&Debug);
     assert_eq!(f, r#"Foo(123, "foo")"#);
@@ -228,7 +228,7 @@ fn derive() {
         C { x: f32, y: () },
     }
     derive!(enum Baz {
-        A(x as Hex(false)),
+        A(x as Hex(false),),
         B,
         C { x, ... },
     });
