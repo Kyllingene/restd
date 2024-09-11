@@ -4,6 +4,13 @@ use super::{Format, Result, Style, Write};
 
 pub struct Arguments<'a>(pub &'a [Var<'a>]);
 
+type FmtFn<T, S> = fn(&T, &mut dyn Write, &S) -> Result;
+type DynFmtFn = unsafe fn(
+    *const (), // self
+    &mut dyn Write,
+    *const (), // style
+) -> Result;
+
 impl Arguments<'_> {
     pub fn write(&self, f: &mut dyn Write) -> Result {
         for var in self.0 {
@@ -17,11 +24,7 @@ impl Arguments<'_> {
 pub struct Var<'a> {
     data: *const (),
     style: *const (),
-    func: unsafe fn(
-        *const (), // data
-        &mut dyn Write,
-        *const (), // style
-    ) -> Result,
+    func: DynFmtFn,
 
     _lt: PhantomData<&'a ()>,
 }
@@ -30,7 +33,6 @@ impl<'a> Var<'a> {
     pub fn new<T, S>(
         data: &'a T,
         style: &'a S,
-        // call: fn(&T, fn(&T, Formatter<'_, S>) -> Result, &S, &mut dyn Write) -> Result,
     ) -> Var<'a>
     where
         T: Format<S>,
@@ -40,9 +42,12 @@ impl<'a> Var<'a> {
             data: data as *const T as *const (),
             style: style as *const S as *const (),
 
-            #[allow(clippy::missing_transmute_annotations)]
+            // SAFETY: `*const ()` is ABI-compatible with `&T where T: Sized`
             func: unsafe {
-                core::mem::transmute(<T as Format<S>>::fmt as fn(&T, &mut dyn Write, &S) -> Result)
+                core::mem::transmute::<
+                    FmtFn<T, S>,
+                    DynFmtFn,
+                >(<T as Format<S>>::fmt as FmtFn<T, S>)
             },
 
             _lt: PhantomData,
