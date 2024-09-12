@@ -309,6 +309,8 @@ where
 mod with_std {
     use crate::fmt::{Debug, Display, Format, Pretty, Result, Write};
 
+    use std::ffi::OsString;
+
     crate::stylable![String];
     crate::stylable!(for(T: Format<Debug>) Vec<T>);
 
@@ -345,6 +347,44 @@ mod with_std {
     {
         fn fmt(&self, f: &mut dyn Write, s: &Pretty) -> Result {
             self.as_slice().fmt(f, s)
+        }
+    }
+
+    impl Write for String {
+        fn write_str(&mut self, data: &str) -> Result {
+            self.push_str(data);
+            Ok(())
+        }
+
+        fn write_char(&mut self, data: char) -> Result {
+            self.push(data);
+            Ok(())
+        }
+    }
+
+    impl Write for Vec<u8> {
+        fn write_str(&mut self, data: &str) -> Result {
+            self.extend_from_slice(data.as_bytes());
+            Ok(())
+        }
+    }
+
+    impl Write for Vec<char> {
+        fn write_str(&mut self, data: &str) -> Result {
+            self.extend(data.chars());
+            Ok(())
+        }
+
+        fn write_char(&mut self, data: char) -> Result {
+            self.push(data);
+            Ok(())
+        }
+    }
+
+    impl Write for OsString {
+        fn write_str(&mut self, data: &str) -> Result {
+            self.push(data);
+            Ok(())
         }
     }
 }

@@ -65,31 +65,24 @@ pub trait Write {
         self.write_str(data.encode_utf8(&mut [0; 4]))
     }
 
-    fn write_args(&mut self, args: args::Arguments<'_>) -> Result
+    fn write_args(mut self: &mut Self, args: args::Arguments<'_>) -> Result
     where
         Self: Sized,
     {
-        args.write(self)
+        for var in args.0 {
+            var.call(&mut self)?;
+        }
+        Ok(())
     }
 }
 
-impl Write for &mut dyn Write {
+impl<W: Write + ?Sized> Write for &mut W {
     fn write_str(&mut self, data: &str) -> Result {
         (*self).write_str(data)
     }
 
     fn write_char(&mut self, data: char) -> Result {
         (*self).write_char(data)
-    }
-}
-
-impl<W: core::fmt::Write + ?Sized> Write for W {
-    fn write_str(&mut self, data: &str) -> Result {
-        self.write_str(data).map_err(|_| Error)
-    }
-
-    fn write_char(&mut self, data: char) -> Result {
-        self.write_char(data).map_err(|_| Error)
     }
 }
 

@@ -63,7 +63,7 @@ impl<S: Style> Modifier for FgRgb<S> {
     where
         T: Format<S> + ?Sized,
     {
-        write!(&mut f, "\x1b[38;2;", self.0, ';', self.1, ';', self.2, 'm' )?;
+        write!(&mut f, "\x1b[38;2;", self.0, ';', self.1, ';', self.2, 'm')?;
         data.fmt(f, &self.3)?;
 
         f.write_str(RESET)?;
@@ -81,7 +81,7 @@ impl<S: Style> Modifier for BgRgb<S> {
     where
         T: Format<S> + ?Sized,
     {
-        write!(&mut f, "\x1b[48;2;", self.0, ';', self.1, ';', self.2, 'm' )?;
+        write!(&mut f, "\x1b[48;2;", self.0, ';', self.1, ';', self.2, 'm')?;
         data.fmt(f, &self.3)?;
 
         f.write_str(RESET)?;
