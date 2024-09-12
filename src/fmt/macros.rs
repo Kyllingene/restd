@@ -5,13 +5,13 @@ macro_rules! format_args {
     };
 
     ($(
-        $(  $el_id:ident   )?
+        $(  $el_id:ident $( . $el_id_field:tt )* )?
         $(  $el_li:literal )?
         $({ $el_ex:expr   })?
         $( as $style:expr )?
     ),+ ,) => {
         $crate::format_args!($(
-            $( $el_id )?
+            $( $el_id $($el_id_field)* )?
             $( $el_li )?
             $( { $el_ex } )?
             $( as $style )?
@@ -19,14 +19,14 @@ macro_rules! format_args {
     };
 
     ($(
-        $(  $el_id:ident   )?
+        $(  $el_id:ident $( . $el_id_field:tt )* )?
         $(  $el_li:literal )?
         $({ $el_ex:expr   })?
         $( as $style:expr )?
     ),+) => {
         $crate::fmt::args::Arguments(&[$(
             $crate::fmt::args::Var::new(
-                $(&$el_id,)?
+                $(&$el_id $(.$el_id_field)*,)?
                 $(&$el_li,)?
                 $(&$el_ex,)?
 
@@ -47,13 +47,13 @@ macro_rules! format_args_nl {
     };
 
     ($(
-        $(  $el_id:ident   )?
+        $(  $el_id:ident $( . $el_id_field:tt )* )?
         $(  $el_li:literal )?
         $({ $el_ex:expr   })?
         $( as $style:expr )?
     ),+ ,) => {
         $crate::format_args_nl!($(
-            $( $el_id )?
+            $( $el_id $($el_id_field)* )?
             $( $el_li )?
             $( { $el_ex } )?
             $( as $style )?
@@ -61,14 +61,14 @@ macro_rules! format_args_nl {
     };
 
     ($(
-        $(  $el_id:ident   )?
+        $(  $el_id:ident $( . $el_id_field:tt )* )?
         $(  $el_li:literal )?
         $({ $el_ex:expr   })?
         $( as $style:expr )?
     ),+) => {
         $crate::fmt::args::Arguments(&[$(
             $crate::fmt::args::Var::new(
-                $(&$el_id,)?
+                $(&$el_id $(.$el_id_field)*,)?
                 $(&$el_li,)?
                 $(&$el_ex,)?
 
@@ -87,7 +87,7 @@ macro_rules! format_args_nl {
 #[macro_export]
 macro_rules! write {
     ($dst:expr, $($t:tt)*) => {
-        $dst.write_args(&$crate::format_args!($($t)*))
+        $dst.write_args($crate::format_args!($($t)*))
     };
 }
 
@@ -98,7 +98,7 @@ macro_rules! writeln {
     };
 
     ($dst:expr, $($t:tt)*) => {
-        $dst.write_args(&$crate::format_args_nl!($($t)*))
+        $dst.write_args($crate::format_args_nl!($($t)*))
     };
 }
 

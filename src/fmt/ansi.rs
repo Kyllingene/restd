@@ -1,4 +1,5 @@
 use super::{Display, Format, Modifier, Result, Style, Write};
+use crate::write;
 
 pub const RESET: &str = "\x1b[0m";
 
@@ -46,6 +47,42 @@ impl<S: Style> Modifier for Bg<S> {
         f.write_char('m')?;
 
         data.fmt(f, &self.1)?;
+
+        f.write_str(RESET)?;
+        Ok(())
+    }
+}
+
+pub struct FgRgb<S>(pub u8, pub u8, pub u8, pub S);
+
+impl<S: Style> Style for FgRgb<S> {}
+impl<S: Style> Modifier for FgRgb<S> {
+    type Inner = S;
+
+    fn apply<T>(&self, mut f: &mut dyn Write, data: &T) -> Result
+    where
+        T: Format<S> + ?Sized,
+    {
+        write!(&mut f, "\x1b[38;2;", self.0, ';', self.1, ';', self.2, 'm' )?;
+        data.fmt(f, &self.3)?;
+
+        f.write_str(RESET)?;
+        Ok(())
+    }
+}
+
+pub struct BgRgb<S>(pub u8, pub u8, pub u8, pub S);
+
+impl<S: Style> Style for BgRgb<S> {}
+impl<S: Style> Modifier for BgRgb<S> {
+    type Inner = S;
+
+    fn apply<T>(&self, mut f: &mut dyn Write, data: &T) -> Result
+    where
+        T: Format<S> + ?Sized,
+    {
+        write!(&mut f, "\x1b[48;2;", self.0, ';', self.1, ';', self.2, 'm' )?;
+        data.fmt(f, &self.3)?;
 
         f.write_str(RESET)?;
         Ok(())
