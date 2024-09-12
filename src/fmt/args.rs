@@ -30,10 +30,7 @@ pub struct Var<'a> {
 }
 
 impl<'a> Var<'a> {
-    pub fn new<T, S>(
-        data: &'a T,
-        style: &'a S,
-    ) -> Var<'a>
+    pub fn new<T, S>(data: &'a T, style: &'a S) -> Var<'a>
     where
         T: Format<S>,
         S: Style,
@@ -44,10 +41,7 @@ impl<'a> Var<'a> {
 
             // SAFETY: `*const ()` is ABI-compatible with `&T where T: Sized`
             func: unsafe {
-                core::mem::transmute::<
-                    FmtFn<T, S>,
-                    DynFmtFn,
-                >(<T as Format<S>>::fmt as FmtFn<T, S>)
+                core::mem::transmute::<FmtFn<T, S>, DynFmtFn>(<T as Format<S>>::fmt as FmtFn<T, S>)
             },
 
             _lt: PhantomData,

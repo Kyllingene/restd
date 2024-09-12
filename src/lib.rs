@@ -1,9 +1,9 @@
 #![cfg_attr(not(any(feature = "std", test, docsrs)), no_std)]
 
 pub mod co;
+mod derives;
 pub mod fmt;
 pub mod io;
-mod derives;
 
 /// The `!` type.
 ///

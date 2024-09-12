@@ -159,8 +159,7 @@ fn pretty_helpers() {
     };
 
     let f = bar.stringify(&Pretty(0));
-    let ex =
-r#"Bar {
+    let ex = r#"Bar {
     foo: Foo(
         123,
         "foo",
@@ -242,18 +241,21 @@ fn derive() {
     let f = Baz::C { x: 12.34, y: () }.stringify(&Debug);
     assert_eq!(f, "C { x: 12.34, ... }");
 
-    struct Qux {
-        x: [f32; 3],
-        y: char,
+    struct Qux<T, Q> {
+        x: T,
+        y: Q,
     }
-    derive!(struct Qux {
+    derive!(struct Qux<T!, Q> where [Q: Format<Display>] {
         x,
         y as Display,
     });
-    
-    let f = Qux { x: [1.23, 4.56, 7.89], y: 'y' }.stringify(&Pretty(0));
-    let ex =
-r#"Qux {
+
+    let f = Qux {
+        x: [1.23, 4.56, 7.89],
+        y: 'y',
+    }
+    .stringify(&Pretty(0));
+    let ex = r#"Qux {
     x: [
         1.23,
         4.56,

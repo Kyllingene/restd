@@ -1,8 +1,20 @@
 use super::{Debug, Display, Format, Hex, Pretty, Result, StdDebug, Style, Write};
 
 crate::stylable![(), str, char, f32, f64, bool];
-crate::stylable!(for(T: Format<Debug>) [T]);
-crate::stylable!(for(T: Format<Debug>, const N: usize) [T; N]);
+crate::stylable!(for(T) [T]);
+crate::stylable!(for(T, const N: usize) [T; N]);
+crate::stylable!(for(T) Option<T>);
+crate::stylable!(for(T, E) core::result::Result<T, E>);
+
+crate::derive!(enum Option<T!> {
+    None,
+    Some(t),
+});
+
+crate::derive!(enum core::result::Result<T!, E!> {
+    Ok(t),
+    Err(e),
+});
 
 fn dbg_char(ch: char, f: &mut dyn Write) -> Result {
     if ch == '\'' {

@@ -59,8 +59,21 @@ macro_rules! derive {
 
 #[macro_export]
 macro_rules! _do_derive {
-    ( $style_name:ident struct $name:ident $(< $($gens:tt)* >)? ) => {
-        impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
+    ( $style_name:ident struct $name:ident $( :: $name_path:ident )*
+        $(<
+            $( $lt:lifetime ),* $(,)?
+            $( $gen:ident $(! $(@ $add_fmt:tt)?)? ),* $(,)?
+        >)?
+        $(where [$( $where:tt )*] )?
+    ) => {
+        impl $(<
+            $( $lt, )*
+            $( $gen $( : $crate::fmt::Format<$crate::fmt::$style_name> $(@ $add_fmt)?)?, )*
+        >)? $crate::fmt::Format<$crate::fmt::$style_name> for $name
+            $( :: $name_path )*
+            $(< $($lt,)* $($gen,)* >)?
+        $( where $( $where )* )?
+        {
             fn fmt(
                 &self,
                 f: &mut dyn $crate::fmt::Write,
@@ -71,15 +84,27 @@ macro_rules! _do_derive {
         }
     };
 
-    ( $style_name:ident
-        struct $name:ident $(< $($gens:tt)* >)? ($(
+    ( $style_name:ident struct $name:ident $( :: $name_path:ident )*
+        $(<
+            $( $lt:lifetime ),* $(,)?
+            $( $gen:ident $(! $(@ $add_fmt:tt)?)? ),* $(,)?
+        >)?
+        $(where [$( $where:tt )*] )?
+        ($(
             $( _ $(@ $skip:tt)? )?
             $( $field:ident
                 $( as $style:expr )?
             )?
         ),* , $(... $(@ $non_exhaustive:tt)?)?)
     ) => {
-        impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
+        impl $(<
+            $( $lt, )*
+            $( $gen $( : $crate::fmt::Format<$crate::fmt::$style_name> $(@ $add_fmt)?)?, )*
+        >)? $crate::fmt::Format<$crate::fmt::$style_name> for $name
+            $( :: $name_path )*
+            $(< $($lt,)* $($gen,)* >)?
+        $( where $( $where )* )?
+        {
             fn fmt(
                 &self,
                 f: &mut dyn $crate::fmt::Write,
@@ -108,15 +133,27 @@ macro_rules! _do_derive {
         }
     };
 
-    ( $style_name:ident
-        struct $name:ident $(< $($gens:tt)* >)? ($(
+    ( $style_name:ident struct $name:ident $( :: $name_path:ident )*
+        $(<
+            $( $lt:lifetime ),* $(,)?
+            $( $gen:ident $(! $(@ $add_fmt:tt)?)? ),* $(,)?
+        >)?
+        $(where [$( $where:tt )*] )?
+        ($(
             $( _ $(@ $skip:tt)? )?
             $( $field:ident
                 $( as $style:expr )?
             )?
         ),*)
     ) => {
-        impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
+        impl $(<
+            $( $lt, )*
+            $( $gen $( : $crate::fmt::Format<$crate::fmt::$style_name> $(@ $add_fmt)?)?, )*
+        >)? $crate::fmt::Format<$crate::fmt::$style_name> for $name
+            $( :: $name_path )*
+            $(< $($lt,)* $($gen,)* >)?
+        $( where $( $where )* )?
+        {
             fn fmt(
                 &self,
                 f: &mut dyn $crate::fmt::Write,
@@ -142,13 +179,25 @@ macro_rules! _do_derive {
         }
     };
 
-    ( $style_name:ident
-        struct $name:ident $(< $($gens:tt)* >)? {$(
+    ( $style_name:ident struct $name:ident $( :: $name_path:ident )*
+        $(<
+            $( $lt:lifetime ),* $(,)?
+            $( $gen:ident $(! $(@ $add_fmt:tt)?)? ),* $(,)?
+        >)?
+        $(where [$( $where:tt )*] )?
+        {$(
             $field:ident
             $( as $style:expr )?
         ),* , $(... $(@ $non_exhaustive:tt)?)?}
     ) => {
-        impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
+        impl $(<
+            $( $lt, )*
+            $( $gen $( : $crate::fmt::Format<$crate::fmt::$style_name> $(@ $add_fmt)?)?, )*
+        >)? $crate::fmt::Format<$crate::fmt::$style_name> for $name
+            $( :: $name_path )*
+            $(< $($lt,)* $($gen,)* >)?
+        $( where $( $where )* )?
+        {
             fn fmt(
                 &self,
                 f: &mut dyn $crate::fmt::Write,
@@ -172,13 +221,25 @@ macro_rules! _do_derive {
         }
     };
 
-    ( $style_name:ident
-        struct $name:ident $(< $($gens:tt)* >)? {$(
+    ( $style_name:ident struct $name:ident $( :: $name_path:ident )*
+        $(<
+            $( $lt:lifetime ),* $(,)?
+            $( $gen:ident $(! $(@ $add_fmt:tt)?)? ),* $(,)?
+        >)?
+        $(where [$( $where:tt )*] )?
+        {$(
             $field:ident
             $( as $style:expr )?
         ),*}
     ) => {
-        impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
+        impl $(<
+            $( $lt, )*
+            $( $gen $( : $crate::fmt::Format<$crate::fmt::$style_name> $(@ $add_fmt)?)?, )*
+        >)? $crate::fmt::Format<$crate::fmt::$style_name> for $name
+            $( :: $name_path )*
+            $(< $($lt,)* $($gen,)* >)?
+        $( where $( $where )* )?
+        {
             fn fmt(
                 &self,
                 f: &mut dyn $crate::fmt::Write,
@@ -199,8 +260,13 @@ macro_rules! _do_derive {
         }
     };
 
-    ( $style_name:ident enum $name:ident $(< $($gens:tt)* >)? {$(
-        $variant:ident
+    ( $style_name:ident enum $name:ident $( :: $name_path:ident )*
+        $(<
+            $( $lt:lifetime ),* $(,)?
+            $( $gen:ident $(! $(@ $add_fmt:tt)?)? ),* $(,)?
+        >)?
+        $(where [$( $where:tt )*] )?
+        {$( $variant:ident
             $(( $(
                 $( _ $(@ $skip:tt)? )?
                 $( $tup_field:ident
@@ -212,8 +278,16 @@ macro_rules! _do_derive {
                 $sct_field:ident
                 $( as $sct_style:expr )?
             ),* $( , $(... $(@ $sct_non_exhaustive:tt)?)? )? })?
-    ),* $(,)?} ) => {
-        impl $crate::fmt::Format<$crate::fmt::$style_name> for $name $(< $($gens)* >)? {
+        ),* $(,)?}
+    ) => {
+        impl $(<
+            $( $lt, )*
+            $( $gen $( : $crate::fmt::Format<$crate::fmt::$style_name> $(@ $add_fmt)?)?, )*
+        >)? $crate::fmt::Format<$crate::fmt::$style_name> for $name
+            $( :: $name_path )*
+            $(< $($lt,)* $($gen,)* >)?
+        $( where $( $where )* )?
+        {
             fn fmt(
                 &self,
                 f: &mut dyn $crate::fmt::Write,
