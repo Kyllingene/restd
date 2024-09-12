@@ -6,12 +6,12 @@ crate::stylable!(for(T, const N: usize) [T; N]);
 crate::stylable!(for(T) Option<T>);
 crate::stylable!(for(T, E) core::result::Result<T, E>);
 
-crate::derive!(enum Option<T!> {
+super::derive!(enum Option<T!> {
     None,
     Some(t),
 });
 
-crate::derive!(enum core::result::Result<T!, E!> {
+super::derive!(enum core::result::Result<T!, E!> {
     Ok(t),
     Err(e),
 });

@@ -31,8 +31,9 @@
 // Worst of all, to maintain consistency, tuple structs have to be downgraded to
 // this inferior syntax.
 
+#[doc(hidden)]
 #[macro_export]
-macro_rules! derive {
+macro_rules! _fmt_derive {
     ( Debug for $($t:tt)* ) => {
         $crate::_do_derive!(Debug $($t)*);
     };
@@ -56,8 +57,10 @@ macro_rules! derive {
         $crate::_do_derive!(Pretty $($t)*);
     };
 }
+pub use _fmt_derive as derive;
 
 #[macro_export]
+#[doc(hidden)]
 macro_rules! _do_derive {
     ( $style_name:ident struct $name:ident $( :: $name_path:ident )*
         $(<

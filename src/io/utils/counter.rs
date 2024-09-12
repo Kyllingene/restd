@@ -1,17 +1,16 @@
 use crate::{fmt, io};
 
+/// A sink that counts the number of bytes written through both [`fmt::Write`]
+/// and [`io::Write`].
+///
+/// Doesn't actually write any data anywhere.
 #[derive(Debug, Default, Clone, Copy, PartialEq, Eq, PartialOrd, Ord, Hash)]
-pub struct Counter(usize);
+pub struct Counter(pub usize);
 
 impl Counter {
+    /// Create a new, empty counter.
     pub fn new() -> Self {
         Self(0)
-    }
-    pub fn count(&self) -> usize {
-        self.0
-    }
-    pub fn reset(&mut self) {
-        self.0 = 0;
     }
 }
 

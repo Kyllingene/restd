@@ -67,7 +67,7 @@ fn manual_args() {
 }
 
 #[test]
-fn manual_pad() {
+fn pad() {
     use crate::fmt::args::*;
 
     let rpad = Pad {
@@ -76,6 +76,14 @@ fn manual_pad() {
         count: 12,
         style: Display,
     };
+
+    let cpad = Pad {
+        align: Dir::Center,
+        with: ' ',
+        count: 6,
+        style: Display,
+    };
+
     let lpad = Pad {
         align: Dir::Left,
         with: ' ',
@@ -86,6 +94,8 @@ fn manual_pad() {
     let slice = [
         Var::new(&"foobar", &rpad),
         Var::new(&'\n', &Display),
+        Var::new(&"abc", &cpad),
+        Var::new(&'\n', &Display),
         Var::new(&"longer-string", &lpad),
     ];
     let args = Arguments(&slice[..]);
@@ -93,7 +103,7 @@ fn manual_pad() {
     let mut f = String::new();
     args.write(&mut f).unwrap();
 
-    assert_eq!(f, "      foobar\nlonger-string");
+    assert_eq!(f, "      foobar\n abc  \nlonger-string");
 }
 
 #[test]
@@ -192,7 +202,7 @@ fn floats() {
 
 #[test]
 fn derive() {
-    use crate::derive;
+    use super::derive;
 
     struct Foo(u32, &'static str);
     derive!(struct Foo(x, y as Debug,));

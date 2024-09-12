@@ -2,6 +2,7 @@ mod adapters;
 pub mod ansi;
 pub mod args;
 mod debug;
+mod derives;
 mod display;
 mod hex;
 mod impls;
@@ -17,6 +18,7 @@ pub type Result = core::result::Result<(), Error>;
 
 pub use adapters::{StdDebug, StdDisplay, StdWrite};
 pub use debug::Debug;
+pub use derives::derive;
 pub use display::Display;
 pub use hex::Hex;
 pub use pad::{Dir, Pad};

@@ -56,7 +56,7 @@ impl<S: Style> Modifier for Pad<S> {
     {
         let mut counter = Counter::new();
         data.fmt(&mut counter, &self.style)?;
-        let chs = self.count.saturating_sub(counter.count());
+        let chs = self.count.saturating_sub(counter.0);
 
         match self.align {
             Dir::Left => {
@@ -65,7 +65,18 @@ impl<S: Style> Modifier for Pad<S> {
                     f.write_char(self.with)?;
                 }
             }
-            Dir::Center => todo!(),
+            Dir::Center => {
+                let before = chs / 2;
+                let after = chs / 2 + (chs % 2);
+
+                for _ in 0..before {
+                    f.write_char(self.with)?;
+                }
+                data.fmt(f, &self.style)?;
+                for _ in 0..after {
+                    f.write_char(self.with)?;
+                }
+            }
             Dir::Right => {
                 for _ in 0..chs {
                     f.write_char(self.with)?;
