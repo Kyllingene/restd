@@ -2,6 +2,7 @@ use super::{Format, Modifier, Result, Style, Write};
 use crate::io::Counter;
 
 /// The direction to place the text in when padding.
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Dir {
     Left,

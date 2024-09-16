@@ -108,6 +108,11 @@ mod with_std {
         }
     }
 
+    /// Convert an [`std::io::ErrorKind`] to an [`Error`].
+    ///
+    /// Note that the conversion is not one-to-one, as `restd::io::Error` makes
+    /// several opinionated decisions about what information is important, and
+    /// what isn't.
     pub fn to_io(e: io::ErrorKind) -> ReadResult {
         Err(match e {
             io::ErrorKind::NotFound => Error::NotFound,

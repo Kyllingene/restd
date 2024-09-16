@@ -180,7 +180,13 @@ pub trait Seek {
     }
 }
 
+/// An error yielded from an I/O operation.
+///
+/// On feature `std`, you can use [`to_io`] to convert from this to
+/// `std::io::Error`. However, note that information *will* be lost in the
+/// process, as this (to remain no-alloc) carries strictly less information.
 #[non_exhaustive]
+#[allow(missing_docs)]
 #[derive(Debug, Clone, Copy, PartialEq)]
 pub enum Error {
     NotFound,

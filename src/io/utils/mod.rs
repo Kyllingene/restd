@@ -5,6 +5,8 @@ pub mod counter;
 pub mod cursor;
 pub mod io_fmt;
 
+/// Copy bytes from `reader` to `writer` until `reader` is exhausted (returns
+/// `None`).
 pub fn copy<R, W>(reader: &mut R, writer: &mut W) -> ReadResult
 where
     R: Read + ?Sized,
