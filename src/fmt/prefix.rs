@@ -1,6 +1,9 @@
 use super::{Display, Format, Modifier, Result, Style, Write};
 
+/// Prints `P` before the data.
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Prefix<P, S>(pub P, pub S);
+super::derive!(struct Prefix<P!, S!>(p, s));
 
 // TODO: perhaps make this more generic
 impl<P: Format<Display>, S: Style> Style for Prefix<P, S> {}

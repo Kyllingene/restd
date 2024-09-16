@@ -1,3 +1,8 @@
+/// Create [`Arguments`](crate::fmt::args::Arguments).
+///
+/// Should not be used directly; rather, use through macros like [`write`] and [`format`].
+///
+/// See [`restd::fmt`](crate::fmt) for details on the syntax.
 #[macro_export]
 macro_rules! format_args {
     () => {
@@ -40,6 +45,11 @@ macro_rules! format_args {
     };
 }
 
+/// Create [`Arguments`](crate::fmt::args::Arguments) with a following newline.
+///
+/// Should not be used directly; rather, use through macros like [`writeln`] and [`println`].
+///
+/// See [`restd::fmt`](crate::fmt) for details on the syntax.
 #[macro_export]
 macro_rules! format_args_nl {
     () => {
@@ -84,6 +94,9 @@ macro_rules! format_args_nl {
     };
 }
 
+/// Write formatted data into a [`Write`](crate::fmt::Write)r.
+///
+/// See [`restd::fmt`](crate::fmt) for details on the syntax.
 #[macro_export]
 macro_rules! write {
     ($dst:expr, $($t:tt)*) => {
@@ -91,6 +104,9 @@ macro_rules! write {
     };
 }
 
+/// Write formatted data into a [`Write`](crate::fmt::Write)r with a following newline.
+///
+/// See [`restd::fmt`](crate::fmt) for details on the syntax.
 #[macro_export]
 macro_rules! writeln {
     ($dst:expr $(,)?) => {
@@ -104,6 +120,9 @@ macro_rules! writeln {
 
 #[cfg(any(feature = "std", test))]
 mod with_std {
+    /// Create a string with formatted data.
+    ///
+    /// See [`restd::fmt`](crate::fmt) for details on the syntax.
     #[macro_export]
     macro_rules! format {
         ($($t:tt)*) => {
@@ -111,6 +130,9 @@ mod with_std {
         };
     }
 
+    /// Print formatted data to stdout.
+    ///
+    /// See [`restd::fmt`](crate::fmt) for details on the syntax.
     #[macro_export]
     macro_rules! print {
         ($($t:tt)*) => {
@@ -118,6 +140,9 @@ mod with_std {
         };
     }
 
+    /// Print formatted data to stdout with a following newline.
+    ///
+    /// See [`restd::fmt`](crate::fmt) for details on the syntax.
     #[macro_export]
     macro_rules! println {
         ($($t:tt)*) => {
@@ -125,6 +150,9 @@ mod with_std {
         };
     }
 
+    /// Print formatted data to stderr.
+    ///
+    /// See [`restd::fmt`](crate::fmt) for details on the syntax.
     #[macro_export]
     macro_rules! eprint {
         ($($t:tt)*) => {
@@ -132,6 +160,9 @@ mod with_std {
         };
     }
 
+    /// Print formatted data to stderr with a following newline.
+    ///
+    /// See [`restd::fmt`](crate::fmt) for details on the syntax.
     #[macro_export]
     macro_rules! eprintln {
         ($($t:tt)*) => {
@@ -139,6 +170,7 @@ mod with_std {
         };
     }
 
+    /// Prints and returns the value of an expression for quick and dirty debugging.
     #[macro_export]
     macro_rules! dbg {
         ($($x:expr),+ $(,)?) => {($(

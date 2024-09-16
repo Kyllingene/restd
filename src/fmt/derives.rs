@@ -291,6 +291,7 @@ macro_rules! _do_derive {
             $(< $($lt,)* $($gen,)* >)?
         $( where $( $where )* )?
         {
+            #[allow(unused)]
             fn fmt(
                 &self,
                 f: &mut dyn $crate::fmt::Write,
@@ -349,5 +350,9 @@ macro_rules! _do_derive {
                 )*}
             }
         }
+    };
+
+    ($($_:tt)*) => {
+        compile_error!("`derive` must start with `struct` or `enum`");
     };
 }

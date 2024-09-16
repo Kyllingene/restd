@@ -1,22 +1,41 @@
 use super::{Format, Modifier, Result, Style, Write};
 use crate::io::Counter;
 
+/// The direction to place the text in when padding.
 #[derive(Debug, Clone, Copy, PartialEq, Eq, Hash)]
 pub enum Dir {
     Left,
     Center,
     Right,
 }
+super::derive!(enum Dir {
+    Left,
+    Center,
+    Right,
+});
 
 // TODO: should this support arbitrary str padding?
+/// Pad any data with a given character until it reaches a certain width.
+#[derive(Clone, Copy, PartialEq, Eq)]
 pub struct Pad<S> {
+    /// The direction to place the text in when padding.
     pub align: Dir,
+    /// The character to pad with.
     pub with: char,
+    /// The width to target when padding.
+    ///
+    /// If the data matches or exceeds this in length already, padding does
+    /// nothing.
     pub count: usize,
+    /// The style being wrapped by this modifier.
     pub style: S,
 }
+super::derive!(struct Pad<S!> { align, with, count, style });
 
 impl<S: Style> Pad<S> {
+    /// Pad left.
+    ///
+    /// Shorthand for `Pad { dir: Dir::Left, with, count, style }`
     pub const fn left(with: char, count: usize, style: S) -> Self {
         Self {
             align: Dir::Left,
@@ -26,6 +45,9 @@ impl<S: Style> Pad<S> {
         }
     }
 
+    /// Pad to the center.
+    ///
+    /// Shorthand for `Pad { dir: Dir::Center, with, count, style }`
     pub const fn center(with: char, count: usize, style: S) -> Self {
         Self {
             align: Dir::Center,
@@ -35,6 +57,9 @@ impl<S: Style> Pad<S> {
         }
     }
 
+    /// Pad right.
+    ///
+    /// Shorthand for `Pad { dir: Dir::Right, with, count, style }`
     pub const fn right(with: char, count: usize, style: S) -> Self {
         Self {
             align: Dir::Right,

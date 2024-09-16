@@ -1,6 +1,8 @@
 use super::{Debug, Display, Error, Format, Pretty, Result, Write};
 use core::fmt;
 
+/// A wrapper around a type implementing [`core::fmt::Debug`] to make it
+/// implement [`restd::fmt::Debug`](Debug).
 pub struct StdDebug<T>(pub T);
 
 impl<T: fmt::Debug> Format<Debug> for StdDebug<T> {
@@ -17,7 +19,10 @@ impl<T: fmt::Debug> Format<Pretty> for StdDebug<T> {
     }
 }
 
+/// A wrapper around a type implementing [`core::fmt::Display`] to make it
+/// implement [`restd::fmt::Display`](Display).
 pub struct StdDisplay<T>(pub T);
+super::derive!(struct StdDisplay<T!>(t));
 
 impl<T: fmt::Display> Format<Display> for StdDisplay<T> {
     fn fmt(&self, f: &mut dyn Write, _: &Display) -> Result {
@@ -26,7 +31,10 @@ impl<T: fmt::Display> Format<Display> for StdDisplay<T> {
     }
 }
 
+/// A wrapper around a type implementing [`core::fmt::Write`] to make it
+/// implement [`restd::fmt::Write`](Write).
 pub struct StdWrite<T>(pub T);
+super::derive!(struct StdWrite<T!>(t));
 
 impl<T: Write> fmt::Write for StdWrite<T> {
     fn write_str(&mut self, s: &str) -> fmt::Result {
