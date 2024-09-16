@@ -1,4 +1,4 @@
-//! The module for stable coroutines.
+//! The module for stable [coroutines](Coroutine).
 
 use core::future::Future;
 use core::pin::Pin;
