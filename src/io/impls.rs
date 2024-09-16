@@ -53,7 +53,9 @@ mod with_alloc {
             Ok(data.len())
         }
 
-        fn flush(&mut self) -> Result<()> { Ok(()) }
+        fn flush(&mut self) -> Result<()> {
+            Ok(())
+        }
     }
 }
 

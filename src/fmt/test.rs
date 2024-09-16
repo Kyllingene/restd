@@ -1,4 +1,4 @@
-use super::{Debug, Dir, Display, Format, Hex, Pad, Prefix, Pretty, Result, Write};
+use super::{Binary, Debug, Dir, Display, Format, Hex, Pad, Prefix, Pretty, Result, Write};
 use crate::format;
 
 #[test]
@@ -190,6 +190,16 @@ fn hex() {
 
     let f = format!(x as Hex(false), ' ', y as Hex(true));
     assert_eq!(f, "1a23 123456789ABCDEF");
+}
+
+#[test]
+fn binary() {
+    let x = 0b010011110010_u16;
+    let y = 0b101100001101_u16;
+    let z = 0b0;
+
+    let f = format!(x as Binary, ' ', y as Binary, ' ', z as Binary::prefix());
+    assert_eq!(f, "10011110010 101100001101 0b0");
 }
 
 #[test]

@@ -6,6 +6,7 @@
 
 mod adapters;
 pub mod args;
+mod binary;
 mod debug;
 mod derives;
 mod display;
@@ -23,6 +24,7 @@ mod test;
 use alloc::string::String;
 
 pub use adapters::{StdDebug, StdDisplay, StdWrite};
+pub use binary::Binary;
 pub use debug::Debug;
 pub use derives::derive;
 pub use display::Display;

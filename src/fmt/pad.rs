@@ -9,11 +9,13 @@ pub enum Dir {
     Center,
     Right,
 }
-super::derive!(enum Dir {
-    Left,
-    Center,
-    Right,
-});
+super::derive!(
+    enum Dir {
+        Left,
+        Center,
+        Right,
+    }
+);
 
 // TODO: should this support arbitrary str padding?
 /// Pad any data with a given character until it reaches a certain width.

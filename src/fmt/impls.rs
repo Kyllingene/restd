@@ -1,4 +1,4 @@
-use super::{Debug, Display, Format, Hex, Pretty, Result, StdDebug, Style, Write};
+use super::{Binary, Debug, Display, Format, Hex, Pretty, Result, StdDebug, Style, Write};
 
 crate::stylable![(), str, char, f32, f64, bool];
 crate::stylable!(for(T) [T]);
@@ -195,6 +195,27 @@ macro_rules! impl_int {
                     f.write_char(ch)?;
                 }
 
+                Ok(())
+            }
+        }
+
+        impl Format<Binary> for $t {
+            fn fmt(&self, f: &mut dyn Write, _: &Binary) -> Result {
+                if *self == 0 {
+                    return f.write_char('0');
+                }
+
+                let mut x = self.reverse_bits();
+                let skip = self.leading_zeros();
+                x >>= skip;
+                for _ in 0..($t::BITS - skip) {
+                    f.write_char(if x & 1 == 1 {
+                        '1'
+                    } else {
+                        '0'
+                    })?;
+                    x >>= 1;
+                }
                 Ok(())
             }
         }
