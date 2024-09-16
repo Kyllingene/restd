@@ -43,6 +43,20 @@ impl<T: Write> Write for &'_ mut T {
     }
 }
 
+#[cfg(any(feature = "alloc", test))]
+mod with_alloc {
+    use crate::io::{Result, Write};
+
+    impl Write for alloc::vec::Vec<u8> {
+        fn write(&mut self, data: &[u8]) -> Result<usize> {
+            self.extend_from_slice(data);
+            Ok(data.len())
+        }
+
+        fn flush(&mut self) -> Result<()> { Ok(()) }
+    }
+}
+
 #[cfg(any(feature = "std", test))]
 mod with_std {
     use crate::io::{Error, Read, ReadResult, Result, Write};

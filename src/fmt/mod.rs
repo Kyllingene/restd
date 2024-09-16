@@ -2,8 +2,7 @@
 //!
 //! The central traits are [`Format`], [`Style`], and [`Write`].
 //!
-//! Reimplementation of
-//! [`std::fmt`](https:?/doc.rust-lang.org/std/fmt/index.html).
+//! Redesign of [`std::fmt`](https:?/doc.rust-lang.org/std/fmt/index.html).
 
 mod adapters;
 pub mod args;
@@ -20,8 +19,8 @@ mod pretty;
 #[cfg(test)]
 mod test;
 
-/// The type returned by formatter methods.
-pub type Result = core::result::Result<(), Error>;
+#[cfg(any(feature = "alloc", test))]
+use alloc::string::String;
 
 pub use adapters::{StdDebug, StdDisplay, StdWrite};
 pub use debug::Debug;
@@ -31,6 +30,9 @@ pub use hex::Hex;
 pub use pad::{Dir, Pad};
 pub use prefix::Prefix;
 pub use pretty::Pretty;
+
+/// The type returned by formatter methods.
+pub type Result = core::result::Result<(), Error>;
 
 /// The error returned by formatter methods.
 ///
@@ -84,7 +86,7 @@ pub trait Format<S: Style> {
     fn fmt(&self, f: &mut dyn Write, style: &S) -> Result;
 
     /// Converts the value into a `String`.
-    #[cfg(any(feature = "std", test))]
+    #[cfg(any(feature = "alloc", test))]
     fn stringify(&self, style: &S) -> String {
         let mut f = String::new();
         self.fmt(&mut f, style).unwrap();
@@ -190,7 +192,7 @@ pub fn _eprint(args: args::Arguments<'_>) {
 }
 
 #[doc(hidden)]
-#[cfg(any(feature = "std", test))]
+#[cfg(any(feature = "alloc", test))]
 pub fn _format(args: args::Arguments<'_>) -> String {
     let mut s = String::new();
     args.write(&mut s).unwrap();

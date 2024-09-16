@@ -305,11 +305,11 @@ where
     }
 }
 
-#[cfg(any(test, feature = "std"))]
-mod with_std {
+#[cfg(any(feature = "alloc", test))]
+mod with_alloc {
     use crate::fmt::{Debug, Display, Format, Pretty, Result, Write};
 
-    use std::ffi::OsString;
+    use alloc::{string::String, vec::Vec};
 
     crate::stylable![String];
     crate::stylable!(for(T: Format<Debug>) Vec<T>);
@@ -380,6 +380,12 @@ mod with_std {
             Ok(())
         }
     }
+}
+
+#[cfg(any(feature = "std", test))]
+mod with_std {
+    use crate::fmt::{Result, Write};
+    use std::ffi::OsString;
 
     impl Write for OsString {
         fn write_str(&mut self, data: &str) -> Result {

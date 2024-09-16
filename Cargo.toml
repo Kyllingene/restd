@@ -7,4 +7,5 @@ license = "MIT"
 
 [features]
 default = ["std"]
-std = []
+std = ["alloc"]
+alloc = []

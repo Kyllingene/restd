@@ -7,6 +7,9 @@
 
 use core::str;
 
+#[cfg(any(feature = "alloc", test))]
+use alloc::{string::String, vec::Vec};
+
 mod impls;
 mod utils;
 
@@ -60,7 +63,7 @@ pub trait Read {
     ///
     /// May reserve an unspecified (but small) amount of space if there's not
     /// enough.
-    #[cfg(any(feature = "std", test))]
+    #[cfg(any(feature = "alloc", test))]
     fn read_onto_vec(&mut self, buf: &mut Vec<u8>) -> ReadResult {
         use core::mem;
 
@@ -87,7 +90,7 @@ pub trait Read {
     }
 
     /// Exhaust the reader, reading onto the end of `buf`.
-    #[cfg(any(feature = "std", test))]
+    #[cfg(any(feature = "alloc", test))]
     fn read_to_end(&mut self, buf: &mut Vec<u8>) -> ReadResult {
         let mut read = 0;
         while let Some(i) = self.read_onto_vec(buf)? {
@@ -101,7 +104,7 @@ pub trait Read {
     /// Exhaust the reader, reading onto the end of `buf`.
     ///
     /// Ensures returned data is valid UTF-8.
-    #[cfg(any(feature = "std", test))]
+    #[cfg(any(feature = "alloc", test))]
     fn read_to_string(&mut self, buf: &mut String) -> ReadResult {
         // SAFETY: the contents are checked for UTF-8 before returning,
         // and emptied if invalid

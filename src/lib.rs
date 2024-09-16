@@ -2,6 +2,9 @@
 #![warn(missing_docs)]
 //! A re-implementation of various std features. Not perfect nor intended to be.
 
+#[cfg(any(feature = "alloc", test))]
+extern crate alloc;
+
 pub mod co;
 pub mod fmt;
 pub mod io;
