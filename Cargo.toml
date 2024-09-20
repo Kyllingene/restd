@@ -3,6 +3,7 @@ name = "restd"
 version = "0.1.0"
 edition = "2021"
 
+description = "A re-implementation of various std features"
 authors = ["Kyllingene"]
 license = "MIT"
 
