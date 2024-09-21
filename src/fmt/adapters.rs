@@ -46,8 +46,8 @@ impl<T: fmt::Write> Write for StdWrite<T> {
     }
 }
 
-/// A wrapper around a type implementing [`restd::fmt::Write`] to make it
-/// implement [`core::fmt::Write`](Write).
+/// A wrapper around a type implementing [`restd::fmt::Write`](Write) to make it
+/// implement [`core::fmt::Write`].
 pub struct RestdWrite<T>(pub T);
 super::derive!(struct RestdWrite<T!>(t));
 
