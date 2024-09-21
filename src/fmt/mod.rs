@@ -23,7 +23,7 @@ mod test;
 #[cfg(any(feature = "alloc", test))]
 use alloc::string::String;
 
-pub use adapters::{StdDebug, StdDisplay, StdWrite};
+pub use adapters::{RestdWrite, StdDebug, StdDisplay, StdWrite};
 pub use binary::Binary;
 pub use debug::Debug;
 pub use derives::derive;
