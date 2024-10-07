@@ -29,7 +29,7 @@ pub use debug::Debug;
 pub use derives::derive;
 pub use display::Display;
 pub use hex::Hex;
-pub use pad::{Dir, Pad};
+pub use pad::{Dir, Pad, Kind};
 pub use prefix::Prefix;
 pub use pretty::Pretty;
 

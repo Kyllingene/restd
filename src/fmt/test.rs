@@ -1,4 +1,4 @@
-use super::{Binary, Debug, Dir, Display, Format, Hex, Pad, Prefix, Pretty, Result, Write};
+use super::{Binary, Debug, Dir, Display, Format, Hex, Pad, Kind, Prefix, Pretty, Result, Write};
 use crate::format;
 
 #[test]
@@ -74,6 +74,7 @@ fn pad() {
         align: Dir::Right,
         with: ' ',
         count: 12,
+        kind: Kind::Full,
         style: Display,
     };
 
@@ -81,13 +82,15 @@ fn pad() {
         align: Dir::Center,
         with: ' ',
         count: 6,
+        kind: Kind::Full,
         style: Display,
     };
 
     let lpad = Pad {
         align: Dir::Left,
         with: ' ',
-        count: 12,
+        count: 5,
+        kind: Kind::Mod,
         style: Display,
     };
 
@@ -103,7 +106,7 @@ fn pad() {
     let mut f = String::new();
     args.write(&mut f).unwrap();
 
-    assert_eq!(f, "      foobar\n abc  \nlonger-string");
+    assert_eq!(f, "      foobar\n abc  \nlonger-string  ");
 }
 
 #[test]
