@@ -48,7 +48,7 @@ pub struct Error;
 /// A specific way to format things, e.g. [`Display`] or [`Hex`], for use by a
 /// [`Format`].
 ///
-/// Some styles (like `Display`) are merely markers; some, like [`Debug`], have
+/// Some styles (like `Display`) are merely markers; some, like [`Debug`](struct@Debug), have
 /// methods on them to aid in using them; and some, like `Hex`, carry additional
 /// information inside about how things should be formatted.
 pub trait Style {}
@@ -78,13 +78,13 @@ pub trait Modifier: Style {
 
 /// A type that can be formatted in a specific [style](Style).
 ///
-/// All types implementing this should also use [`stylable`].
+/// All types implementing this should also use [`stylable`](crate::stylable).
 ///
 /// A more general form of traits like `Display` and `Debug` in std; the
 /// equivalent forms would be <code>Format<[Display]></code> and
-/// <code>Format<[Debug]></code>.
+/// <code>Format<[Debug](struct@Debug)></code>.
 pub trait Format<S: Style> {
-    /// Formats the value given a [writer](Writer) and a [style](Style).
+    /// Formats the value given a [writer](Write) and a [style](Style).
     fn fmt(&self, f: &mut dyn Write, style: &S) -> Result;
 
     /// Converts the value into a `String`.
@@ -143,6 +143,8 @@ impl<W: Write + ?Sized> Write for &mut W {
 
 /// Use this on any and all types implementing any kind of `Format`. This allows
 /// a given type to be styled with any modifier.
+///
+/// Automatically applied with [`derive`].
 #[macro_export]
 macro_rules! stylable {
     (for($($gen:tt)*) $($typ:tt)*) => {

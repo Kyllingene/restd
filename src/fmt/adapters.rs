@@ -2,7 +2,7 @@ use super::{Debug, Display, Error, Format, Pretty, Result, Write};
 use core::fmt;
 
 /// A wrapper around a type implementing [`core::fmt::Debug`] to make it
-/// implement [`restd::fmt::Debug`](Debug).
+/// implement [`restd::fmt::Debug`](struct@Debug).
 pub struct StdDebug<T>(pub T);
 
 impl<T: fmt::Debug> Format<Debug> for StdDebug<T> {

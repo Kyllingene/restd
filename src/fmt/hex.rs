@@ -7,7 +7,7 @@ use super::Prefix;
 /// Unlike [`Debug`](super::Debug) and [`Pretty`](super::Pretty), cannot be
 /// derived, since most types cannot be intuitively formatted in hex.
 ///
-/// Equivalent of [`core::fmt::Hex`].
+/// Equivalent of [`core::fmt::LowerHex`] and [`core::fmt::UpperHex`].
 #[derive(Default, Clone, Copy)]
 pub struct Hex(pub bool);
 impl super::Style for Hex {}

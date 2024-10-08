@@ -2,7 +2,7 @@
 
 use core::marker::PhantomData;
 
-use super::{Format, Result, Style, Write};
+use super::{Format, Result, Style, Write, Display};
 
 /// A list of [`Var`]s.
 pub struct Arguments<'a>(pub &'a [Var<'a>]);
@@ -22,6 +22,12 @@ impl Arguments<'_> {
         }
 
         Ok(())
+    }
+}
+
+impl Format<Display> for Arguments<'_> {
+    fn fmt(&self, f: &mut dyn Write, _: &Display) -> Result {
+        self.write(f)
     }
 }
 
