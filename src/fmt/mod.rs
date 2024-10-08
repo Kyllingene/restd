@@ -144,13 +144,16 @@ impl<W: Write + ?Sized> Write for &mut W {
 /// Use this on any and all types implementing any kind of `Format`. This allows
 /// a given type to be styled with any modifier.
 ///
+/// Can either be used as `stylable!(Type)`, or 
+/// `stylable!(for('a, T) Type<'a, T>)` (no trailing commas!).
+///
 /// Automatically applied with [`derive`].
 #[macro_export]
 macro_rules! stylable {
     (for($($gen:tt)*) $($typ:tt)*) => {
         impl<
+            $($gen)*,
             __StylableModifier,
-            $($gen)*
         > $crate::fmt::Format<__StylableModifier> for $($typ)*
         where
             $($typ)*: $crate::fmt::Format<__StylableModifier::Inner>,

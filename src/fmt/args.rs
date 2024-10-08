@@ -25,6 +25,7 @@ impl Arguments<'_> {
     }
 }
 
+crate::stylable!(for('a) Arguments<'a>);
 impl Format<Display> for Arguments<'_> {
     fn fmt(&self, f: &mut dyn Write, _: &Display) -> Result {
         self.write(f)
