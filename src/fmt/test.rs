@@ -1,4 +1,4 @@
-use super::{Binary, Debug, Dir, Display, Format, Hex, Pad, Kind, Prefix, Pretty, Result, Write};
+use super::{Binary, Debug, Dir, Display, Format, Hex, Kind, Pad, Prefix, Pretty, Result, Write};
 use crate::format;
 
 #[test]

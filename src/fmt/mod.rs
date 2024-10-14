@@ -29,7 +29,7 @@ pub use debug::Debug;
 pub use derives::derive;
 pub use display::Display;
 pub use hex::Hex;
-pub use pad::{Dir, Pad, Kind};
+pub use pad::{Dir, Kind, Pad};
 pub use prefix::Prefix;
 pub use pretty::Pretty;
 
@@ -144,7 +144,7 @@ impl<W: Write + ?Sized> Write for &mut W {
 /// Use this on any and all types implementing any kind of `Format`. This allows
 /// a given type to be styled with any modifier.
 ///
-/// Can either be used as `stylable!(Type)`, or 
+/// Can either be used as `stylable!(Type)`, or
 /// `stylable!(for('a, T) Type<'a, T>)` (no trailing commas!).
 ///
 /// Automatically applied with [`derive`].

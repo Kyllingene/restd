@@ -9,7 +9,13 @@ pub enum Dir {
     Center,
     Right,
 }
-super::derive!(enum Dir { Left, Center, Right });
+super::derive!(
+    enum Dir {
+        Left,
+        Center,
+        Right,
+    }
+);
 
 /// The style of padding.
 #[allow(missing_docs)]
@@ -22,7 +28,12 @@ pub enum Kind {
     /// Pad until the data is a multiple of `count` characters wide.
     Mod,
 }
-super::derive!(enum Kind { Full, Mod });
+super::derive!(
+    enum Kind {
+        Full,
+        Mod,
+    }
+);
 
 // TODO: should this support arbitrary str padding?
 /// Pad any data with a given character until it reaches a certain width.
@@ -151,7 +162,7 @@ impl<S: Style> Modifier for Pad<S> {
             }
             Dir::Center => {
                 let before = chs / 2;
-                let after = chs / 2 + (chs % 2);
+                let after = chs.div_ceil(2);
 
                 for _ in 0..before {
                     f.write_char(self.with)?;

@@ -2,7 +2,7 @@
 
 use core::marker::PhantomData;
 
-use super::{Format, Result, Style, Write, Display};
+use super::{Display, Format, Result, Style, Write};
 
 /// A list of [`Var`]s.
 pub struct Arguments<'a>(pub &'a [Var<'a>]);

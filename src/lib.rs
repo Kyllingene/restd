@@ -8,7 +8,9 @@ extern crate alloc;
 pub mod co;
 pub mod fmt;
 pub mod io;
-pub mod prelude;
+
+// TODO: figure out a way to implement a macro-inclusive glob import properly
+// pub mod prelude;
 
 /// The `!` type.
 ///
